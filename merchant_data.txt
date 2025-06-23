@@ -1,0 +1,66 @@
+Material
+IronOre Äq¥Û 1 10 5 0 0
+CopperOre »ÉÄq 1 12 4 0 0
+SilverOre »ÈÄq 1 8 10 0 0
+GoldNugget ª÷¶ô 2 5 25 0 0
+Coal ·Ñ¬´ 1 15 2 0 0
+Wood ¤ì§÷ 1 20 1 0 0
+Herb ¯óÃÄ 1 10 0 5 0
+ManaHerb Å]¯ó 1 8 0 10 0
+CrystalShard ¤ô´¹¸H¤ù 2 6 0 0 5
+Leather ¥Ö­² 1 9 0 2 0
+Cloth ¥¬®Æ 1 12 0 1 0
+Bone °©ÀY 1 14 0 0 3
+Feather ¦Ð¤ò 1 18 0 0 2
+Gemstone Ä_¥Û 3 3 0 0 20
+Sulfur ²¸ÁD 1 11 0 0 1
+Salt ÆQ´¹ 1 20 0 0 0
+Mushroom Ä¨Û£ 1 16 0 0 2
+Flower ªáÃ¤ 1 13 0 0 1
+Bark ¾ð¥Ö 1 17 0 0 1
+Oil ªo¯× 1 7 0 0 4
+
+Equipment
+LeatherArmor ¥Ö¥Ò 0 0 5 0 1 30 0 0
+IronSword ÅK¼C 0 5 0 0 1 50 0 0
+SteelShield ¿û¬Þ 0 0 8 0 2 80 0 0
+ChainMail Âê¤l¥Ò 0 0 10 0 2 100 0 0
+IronHelmet ÅK²¯ 0 0 6 0 1 40 0 0
+SteelGreaves ¿ûÅK×H¥Ò 0 0 7 0 2 70 0 0
+SilverRing »È§Ù 0 2 2 0 1 120 0 0
+GoldAmulet ª÷¶µÁå 0 0 3 5 2 200 0 0
+MithrilArmor ¯µ»ÈñZ¥Ò 0 0 15 5 3 500 0 0
+BronzeDagger «C»É¤P­º 0 4 0 0 1 60 0 0
+ElvenBow ºëÆF¤} 0 6 0 0 2 150 0 0
+DwarvenAxe ¸G¤H©ò 0 7 0 0 2 140 0 0
+WizardRobe §Å®vªø³T 0 0 2 10 2 160 0 0
+AssassinCloak ¨ë«È©Ü­· 0 0 3 0 2 130 0 0
+Gauntlets ¤â®M 0 1 1 0 1 35 0 0
+BootsOfSpeed ¨³±¶¤§¹u 0 0 2 0 1 45 0 0
+ShieldOfLight ¥ú©ú¤§¬Þ 0 0 12 0 3 220 0 0
+StaffOfFire ¤õµKªk§ú 0 3 0 5 2 180 0 0
+HelmetOfWisdom ´¼¼zÀY²¯ 0 0 4 5 2 170 0 0
+ArmorOfFortune ©¯¹B®M¥Ò 0 20 8 2 3 240 0 0
+HolySword ¸t¼C 0 0 80 0 30 800 0 0
+
+MysteryItem
+MysteryPotion ¯«¯µÃÄ¤ô RandomHeal 0 0 0 0 3 1 50 0 0 1
+CursedScroll ¶A©G¨÷¶b DarkKnowledge 0 0 0 0 5 2 0 50 0 0 1
+ElixirOfChaos ²V¨PÃÄ¾¯ ChaosEffect 0 0 0 0 4 2 60 0 0 1
+TomeOfSecrets ¯µ±K¤§®Ñ SecretWisdom 0 0 0 0 6 3 0 70 0 0 1
+ScrollOfFate ©R¹B¨÷¶b FateTick 0 0 0 0 3 1 80 0 0 1
+LuckyCharm ©¯¹BÅ@²Å LuckBoost 0 0 0 0 4 1 90 0 0 1
+UnluckyCharm ¤£©¯Å@²Å Misfortune 0 0 0 0 5 2 0 60 0 0 1
+OrbOfMystery ¯«¯µ¤§²y MysteryPulse 0 0 0 0 4 2 100 0 0 1
+AmuletOfLuck ©¯¹BÅ@¨­²Å LuckyAura 0 0 0 0 3 1 110 0 0 1
+RingOfChaos ²V¨P¤§§Ù ChaosRing 0 0 0 0 5 2 0 120 0 0 1
+PhialOfShadows ·t¼v²~ ShadowTouch 0 0 0 0 4 2 130 0 0 1
+VialOfLight ¥ú©ú²~ LightBlessing 0 0 0 0 3 1 140 0 0 1
+BoxOfWonders ©_ÂÝ½c WonderBurst 0 0 0 0 5 3 0 150 0 0 1
+ChestOfFate ©R¹BÄ_½c FateGift 0 0 0 0 4 2 160 0 0 1
+RuneOfMystery ¯«¯µ²Å¤å RunePower 0 0 0 0 3 1 170 0 0 1
+KeyOfDestiny ©R¹B¤§Æ_ DestinyKey 0 0 0 0 5 2 0 180 0 0 1
+MaskOfDeceit ´Û¶B­±¨ã DeceitMask 0 0 0 0 4 2 190 0 0 1
+CloakOfShadows ¼v¤§¤æÁO ShadowCloak 0 0 0 0 3 1 200 0 0 1
+AmuletOfChaos ²V¨PÅ@²Å ChaosAmulet 0 0 0 0 5 3 0 210 0 0 1
+TalismanOfLuck ©¯¹BÅ@²Å TalismanLuck 0 0 0 0 4 1 220 0 0 1

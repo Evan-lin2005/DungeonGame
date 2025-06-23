@@ -1,0 +1,56 @@
+Material草藥 基礎配方材料 0 30 
+Material精金礦石 高品質礦石 1 15 
+Material魔晶石 蘊含魔力 2 12 
+Material骸骨碎片 亡靈骨骼 0 25 
+Material魔獸皮 強韌皮革 1 20 
+Material龍鱗 傳說龍鱗 6 5 
+Material神秘水晶 罕見晶體 3 10 
+Material元素精華 濃縮元素 4 8 
+Material布料 基礎布料 0 30 
+Material鋼錠 冶煉材料 1 20 
+Material精魂 精煉魂魄 3 6 
+Material命運之沙 重置砂 5 2 
+Material星塵 魔法粒子 2 18 
+Material野豬鬃 毛皮 0 15
+Material巨人之骨 壯骨材料 2 8
+Material火焰核心 火元素核心 4 3 
+Material冰霜核心 冰元素核心 4 3 
+Material雷霆核心 雷元素核心 4 3 
+Material亞光碎片 未知碎片 3 7 
+Material夜影石 神秘石材 5 4 
+Material銀礦 鑄劍材料 1 18 
+Material金礦 金屬原石 2 12 
+Material獸眼 兇獸之眼 3 5 
+Material藥王花 傳說花卉 5 2 
+Material陰陽石 能量石 4 6 
+Material幽魂尾 輕魂材料 3 8 
+Material鳳凰羽 傳說羽毛 6 1 
+Material龍心 核心材料 6 2 
+Material巨人之心 壯大力量 5 1 
+Material混沌之核 未知能量 6 2 
+Equipment 
+Equipment木劍 基礎木製劍 0 0 2 0 0 
+Equipment鐵劍 強化鋼劍 1 0 5 0 0 
+Equipment鋼劍 高級鋼劍 2 0 8 0 0 
+Equipment戰錘 重型戰錘 3 0 12 0 0 
+Equipment獵人弓 遠程獵弓 1 0 4 0 0 
+Equipment長弓 精準遠弓 2 0 7 0 0 
+Equipment弩 重型弩 3 0 10 0 0 
+Equipment匕首 輕巧短刀 0 0 3 0 0 
+Equipment法杖 施法之杖 2 0 0 0 6 
+Equipment魔杖 元素魔杖 3 0 0 0 8 
+Equipment皮甲 輕型皮甲 0 0 2 0 0 
+Equipment鎖子甲 鎖子護甲 1 0 5 0 0 
+Equipment鋼甲 強化鋼甲 2 0 8 0 0 
+Equipment龍鱗鎧 傳說龍鱗鎧 7 0 15 0 0 
+Equipment法師袍 魔法袍 3 0 0 0 6 
+Equipment盾牌 圓形護盾 0 0 4 0 0 
+Equipment巨盾 防禦重盾 3 0 10 0 0 
+Equipment元素護肩 元素之力 4 0 0 5 2 
+Equipment幽影披風 隱匿披風 5 0 0 3 1 
+Equipment聖騎盔甲 聖光之鎧 100 0 0 10 0
+MysteryItem 生命再生 自我回復 每回合+5HP 5 0 0 0 3 
+MysteryItem戰意高昂 狂暴激勵 每回合+3ATK 0 3 0 0 2 
+MysteryItem鋼鐵意志 堅韌護盾 每回合+2DEF 0 0 2 0 2 
+MysteryItem能量激勵 魅力增幅 每回合+5MP 0 0 0 5 3
+
