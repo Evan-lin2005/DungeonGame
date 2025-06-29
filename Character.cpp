@@ -187,6 +187,11 @@ void Player::Affected() {
 
 bool Player::Died() const { return currHp <= 0; }
 
+const Money& Player::showmoney()
+{
+    return money;
+}
+
 void Player::learnskill(const Skill& skill) {
     Skills.push_back(skill);
 }
@@ -279,6 +284,11 @@ std::string Player::getBattleSkillName(int idx) const
 {
 	return BattleSkills[idx].Name;
 }
+
+const std::map<std::string, MiseryItem>& Player::getMyseryBackpack() const {
+    return MyseryBackpack;
+}
+
 
 void Player::earnedexp(int e) {
 	nextlevel = false; 
@@ -414,16 +424,13 @@ void Player::Levelup() {
     while (exp >= lv * lv * ExpPerLevel) {
         nextlevel = true;
         ++lv;
-        MaxHp += 20; currHp = MaxHp;
-        MaxMp += 10;  currMp = MaxMp;
-        Atk += 5; Def += 5;
+        MaxHp += 10; currHp = MaxHp;
+        MaxMp += 8;  currMp = MaxMp;
+        Atk += 3; Def += 3;
     }
 }
 
 
-#include <unordered_map>
-// Character.cpp
-#include "Character.h"
 #include <unordered_map>
 #include <cstdlib>   // std::rand
 
@@ -516,12 +523,12 @@ static const std::unordered_map<std::string, std::vector<Material>> kEnemyMateri
 Enemy::Enemy(const std::string& race,
     const std::string& name,
     int hp, int mp, int atk, int def,
-    int expGain, float missRate)
+    int expGain, float missRate,int rank)
     : Race(race), name(name),
     MaxHp(hp), HP(hp),
     MaxMp(mp), mp(mp),
     Atk(atk), Def(def),
-    expGain(expGain), MissRate(missRate)
+	expGain(expGain), MissRate(missRate), rank(rank), Skillidx(-1)
 {
     // (1) 載入技能
     auto itSkill = kEnemySkillTable.find(Race);
@@ -558,6 +565,7 @@ Enemy& Enemy::operator=(const Enemy& E)
     Effects = E.Effects; 
     MissRate = E.MissRate;
 	Skills = E.Skills; // 複製技能列表
+	rank = E.rank;
     return *this;
 }
 
@@ -727,16 +735,23 @@ int Enemy::gethp() const { return HP; }
 int Enemy::getmp() const { return mp; }
 int Enemy::getatk() const { return Atk; }
 int Enemy::getdef() const { return Def; }
+int Enemy::getrank() const { return rank; }
 float Enemy::getMissRate()const { return MissRate; }
 std::string Enemy::getSkillName() const { return Skillidx == -1 ? "攻擊" : Skills[Skillidx].Name; }
-
 std::string Enemy::getRace() const
-{
-    return Race;
-}
+{return Race;}
 
 
 std::vector<Material> Enemy::getFallBackpack() const
 {
 	return FallBackpack;
+}
+
+void Enemy::upgrageByFloor(int floor)// 每層提升10%
+{
+	MaxHp = MaxHp*=(1+(0.1*floor));
+	MaxMp = MaxMp *= (1 + (0.1 * floor));
+	Atk = Atk *= (1 + (0.1 * floor));
+	Def = Def *= (1 + (0.1 * floor));
+	expGain = expGain * (1 + (0.1 * floor)); 
 }

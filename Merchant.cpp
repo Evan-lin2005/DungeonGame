@@ -1,5 +1,5 @@
 #include "Merchant.h"
-
+#include <cctype>
 
 void Merchant::Interact(Player& p)
 {
@@ -11,6 +11,7 @@ void Merchant::Interact(Player& p)
 		std::cin.clear();
 		std::cin.sync();
 		std::cout << "請選擇你想購買或出售的材料，輸入對應的編號：(輸入(Q/q)離開商店)" << std::endl;
+		std::cout << "目前擁有金錢" <<"金幣: "<< p.showmoney().Gold <<" 銀幣: " << p.showmoney().Sliver << " 銅幣: "<< p.showmoney().Cooper << std::endl;
 		while (true) {
 			std::string input;
 			std::cin >> input;
@@ -18,6 +19,15 @@ void Merchant::Interact(Player& p)
 				std::cout << "感謝光臨，歡迎下次再來！" << std::endl;
 				break;
 			}
+			bool legal = true;
+			for (char c : input) {
+				if (!isdigit(c)) {
+					std::cout << "客人,請輸入正確的編號：" << std::endl;
+					legal = false;
+					break;
+				}
+			}
+			if (!legal) continue;
 			int choose = stoi(input);
 			if (choose < 0 || choose >= MaterialList.size()) {
 				std::cout << "客人,本店沒有這項商品：" << std::endl;
@@ -62,6 +72,7 @@ void Merchant::Interact(Player& p)
 		std::cout << "這裡有各種裝備供你購買。" << std::endl;
 		showGoods();
 		std::cout << "請選擇你想購買的裝備，輸入對應的編號：(輸入(Q/q)離開商店)" << std::endl;
+		std::cout << "目前擁有金錢" << "金幣: " << p.showmoney().Gold << " 銀幣: " << p.showmoney().Sliver << " 銅幣: " << p.showmoney().Cooper << std::endl;
 		while (true)
 		{
 			std::string input;
@@ -100,6 +111,7 @@ void Merchant::Interact(Player& p)
 		std::cout << "這裡有各種道具供你購買。" << std::endl;
 		showGoods();
 		std::cout << "請選擇你想購買的道具，輸入對應的編號：(輸入(Q/q)離開商店)" << std::endl;
+		std::cout << "目前擁有金錢" << "金幣: " << p.showmoney().Gold << " 銀幣: " << p.showmoney().Sliver << " 銅幣: " << p.showmoney().Cooper << std::endl;
 		while (true) {
 			std::string input;
 			std::cin >> input;

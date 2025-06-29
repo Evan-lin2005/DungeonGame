@@ -36,7 +36,7 @@ inline bool nextTokens(std::ifstream& in, std::vector<std::string>& out) {
 // ================= ¼Ä¤H =================
 inline Enemy makeEnemy(const std::vector<std::string>& t) {
     return Enemy(t[0],t[1], std::stoi(t[2]), std::stoi(t[3]),
-        std::stoi(t[4]), std::stoi(t[5]), std::stoi(t[6]),stof(t[7]));
+        std::stoi(t[4]), std::stoi(t[5]), std::stoi(t[6]),stof(t[7]),stoi(t[8]));
 }
 
 inline std::vector<Enemy> loadEnemies(const std::string& path) {
@@ -46,7 +46,7 @@ inline std::vector<Enemy> loadEnemies(const std::string& path) {
 
     std::vector<std::string> tk;
     while (nextTokens(in, tk)) {
-        if (tk.size() >= 8) list.push_back(makeEnemy(tk));
+        if (tk.size() >= 9) list.push_back(makeEnemy(tk));
     }
     return list;
 }

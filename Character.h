@@ -71,6 +71,7 @@ public:
     void BeEffect(const Effect& e);
     void Affected();
     bool Died() const;
+    const Money& showmoney();
 
     void learnskill(const Skill& skill);
     bool setbattleskill(int idx);
@@ -79,6 +80,7 @@ public:
     std::vector<std::pair<std::string, std::string>> allskillsDesc() const;
     std::vector<std::pair<std::string, std::string>> allLearnskillsDesc() const;
 	std::vector<std::pair<std::string, std::string>> allEquipsDesc() const;
+
 	bool canEquip()const;
 
     std::string getname() const;
@@ -93,6 +95,7 @@ public:
 	int getEquipSize() const;
     std::string getSkillName(int idx) const;
 	std::string getBattleSkillName(int idx) const;
+    const std::map<std::string, MiseryItem>& getMyseryBackpack()const;
 
     void earnedexp(int exp);
 
@@ -122,7 +125,7 @@ private:
 class Enemy {
 public:
     Enemy(const std::string &race,const std::string& name,
-        int hp, int mp, int atk, int def, int expGain,float missRate);
+        int hp, int mp, int atk, int def, int expGain,float missRate,int rank);
     Enemy& operator= (const Enemy& E);
     ~Enemy();
     std::string getname() const;
@@ -139,10 +142,12 @@ public:
     int getmp() const;
     int getatk() const;
     int getdef() const;
+    int getrank()const;
 	float getMissRate() const;
 	std::string getRace() const;
     std::string getSkillName() const;
 	std::vector<Material> getFallBackpack() const;
+    void upgrageByFloor(int floor);//隨著地下城深入而升級
 private:
     std::string Race;//種族(決定擁有技能)
     std::string name;
@@ -152,6 +157,7 @@ private:
     int expGain;
 	int Skillidx;// 技能索引
 	float MissRate; // 閃避率
+	int rank;// 階級(決定出現機率)
 	std::vector<Material> FallBackpack; // 掉落物品
     std::vector<Skill> Skills;
     std::vector<Effect> Effects;

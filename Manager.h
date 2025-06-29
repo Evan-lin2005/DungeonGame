@@ -34,7 +34,7 @@ public:
     Manager(int width, int height, const Player& p);
     Manager(int width, int height);
 
-    void spawnEnemies(const std::vector<Enemy>& prototypes, int maxNum);
+    void spawnEnemies(const std::vector<Enemy>& prototypes, int maxNum,int floor);
     void spawnMerchants(int count, const std::string& merchantDataPath);
     void nextMap();
     void moveMainCharacter(int dir);

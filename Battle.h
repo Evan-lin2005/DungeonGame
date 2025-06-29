@@ -25,9 +25,9 @@ inline void printItem(const std::vector<Material>& items) {
 
 inline int choose() {
     while (true) {
-        std::cout << "請選擇:1.普攻 2.技能> ";
+        std::cout << "請選擇:1.普攻 2.技能 3.道具> ";
         std::string idx; std::cin >> idx;
-        if (idx == "1" || idx == "2") return stoi(idx);
+        if (idx == "1" || idx == "2"||idx == "3") return stoi(idx);
         std::cout << "無效操作\n";
     }
 }
@@ -47,6 +47,65 @@ inline void getallItem(Player& a, const std::vector<Material>& items) {
     }
 }
 
+inline void playerUseItemDuringBattle(Player& a, Enemy& b) {
+    if (a.getMyseryBackpack().empty()) {
+        std::cout << "你沒有任何可用的道具。\n";
+        system("pause");
+        return;
+    }
+
+    std::cout << "可用道具：\n";
+    int idx = 0;
+    std::vector<std::string> items;
+    for (auto& it : a.getMyseryBackpack()) {
+        std::cout << idx << ". " << it.second.getName() << " - " << it.second.getDesc() << "\n";
+        items.push_back(it.first);
+        idx++;
+    }
+
+    std::cout << "請輸入要使用的道具編號：";
+    int choice;
+    std::cin >> choice;
+    if (choice < 0 || choice >= items.size()) {
+        std::cout << "輸入錯誤，取消使用。\n";
+        system("pause");
+        return;
+    }
+
+    const std::string& itemName = items[choice];
+    auto it = a.getMyseryBackpack().find(itemName);
+    if (it == a.getMyseryBackpack().end()) return;
+
+    Effect e = it->second.itemEffect;
+
+    bool reversed = (rand() % 100 < 30);
+    if (reversed) {
+        std::cout << "[道具失控!] 效果扭曲為反向效果！\n";
+        e.affectHp = -e.affectHp;
+        e.affectMp = -e.affectMp;
+        e.affectAtk = -e.affectAtk;
+        e.affectDef = -e.affectDef;
+        e.affectMissRate = -e.affectMissRate;
+    }
+
+    // 根據效果內容決定施加對象
+    bool isBuff = (e.affectHp > 0 || e.affectMp > 0 || e.affectAtk > 0 || e.affectDef > 0 || e.affectMissRate > 0);
+
+    if (isBuff) {
+        std::cout << a.getname() << " 獲得了 " << it->second.getName() << " 的效果。\n";
+        a.BeEffect(e);
+    }
+    else {
+        std::cout << b.getname() << " 被施加了 " << it->second.getName() << " 的效果。\n";
+        b.BeEffect(e);
+    }
+
+    a.throwMyseryItem(it->second);
+    system("pause");
+}
+
+
+
 // Battle.h 內修改後的 Battle() 函式
 inline bool Battle(Player& a, Enemy& b) {
     clearScreen();
@@ -65,19 +124,34 @@ inline bool Battle(Player& a, Enemy& b) {
         b.Affected();
 
         // ==== 玩家回合 ====
-        int choice = choose();  // 1. 普攻 2. 技能
+        bool usedItemThisTurn = false;
+        int choice = choose();
+
+        while (choice == 3) {
+            if (!usedItemThisTurn) {
+                playerUseItemDuringBattle(a, b);
+                usedItemThisTurn = true;
+            }
+            else {
+                std::cout << "本回合已經使用過道具了，不能再用。\n";
+                system("pause");
+            }
+            choice = choose();
+        }
+
         SkillResult playerRes;
         if (choice == 1) {
             playerRes.immediateDamage = a.Basicattack();
-			std::cout << a.getname() << " 進行攻擊！\n";
+            std::cout << a.getname() << " 進行攻擊！\n";
         }
-        else {
+        else if (choice == 2) {
             printallskill(a);
             int idx; std::cin >> idx;
             playerRes = a.useSkill(idx);
-            std::cout<< a.getname() << " 使用了技能 "
-				<< a.getBattleSkillName(idx) << "！\n";
+            std::cout << a.getname() << " 使用了技能 "
+                << a.getBattleSkillName(idx) << "！\n";
         }
+
 
         // 1) 玩家持續／瞬發效果
         if (playerRes.effect) {
