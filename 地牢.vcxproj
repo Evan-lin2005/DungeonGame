@@ -129,6 +129,7 @@
     <ClInclude Include="DataLoader.h" />
     <ClInclude Include="DungeonGame.h" />
     <ClInclude Include="Addition.h" />
+    <ClInclude Include="GameAsk.h" />
     <ClInclude Include="treasurebox.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Manager.h" />
