@@ -4,11 +4,11 @@
 DungeonGame::DungeonGame(int width, int height, int maxFloor)
     : WIDTH(width), HEIGHT(height), MAX_FLOOR(maxFloor),
     floor_(1), victory_(false),
-    hero_("Hero"), mgr_(width, height, hero_), boss_("Boss", "Dark", 1000000, 10000, 12400, 18000, 9999999, 10)
+    hero_("Hero"), mgr_(width, height, hero_), boss_("Boss", "Dark", 1000000, 10000, 12400, 18000, 9999999, 10,7)
 {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
     initData();
-	mgr_.spawnEnemies(pool_, rand()%(20));
+	mgr_.spawnEnemies(pool_, rand()%(20),floor_);
 }
 
 void DungeonGame::initData() {
@@ -34,11 +34,11 @@ void DungeonGame::initData() {
         std::exit(1);
     }
     // 載入 Boss
-    boss_ = Enemy("Boss","Dark(weak)", 500, 200, 40, 20, 0, 0);
+    boss_ = Enemy("Boss","Dark(weak)", 500, 200, 40, 20, 0, 0,7);
     auto tmp = loadEnemies(kBossData);
     if (!tmp.empty()) boss_ = tmp.front();
     boss_.learnskill(Skill("魔神化","短暫使自身化身魔神",150.f,3,150,2));
-	boss_.learnskill(Skill("魔神之怒", "對敵人造成大量傷害", 3.6f, 0, 300, 2));
+	boss_.learnskill(Skill("魔神之怒", "對敵人造成大量傷害", 5.0f, 0, 300, 2));
 	loadTreasureBox(kTreasureBoxData);
 
     mgr_.spawnMerchants(rand() % 5 + 1, KMerchantData);
@@ -82,7 +82,7 @@ void DungeonGame::run() {
             ++floor_;
             mgr_.nextMap();
             // 每層敵人數量可依 floor_ 調整
-            mgr_.spawnEnemies(pool_, 5 + floor_);
+            mgr_.spawnEnemies(pool_, 5 + floor_,floor_);
             mgr_.spawnMerchants(rand() % 5 + 1, KMerchantData);
 			mgr_.putTextureBox(rand() % 5 + 1);
         }

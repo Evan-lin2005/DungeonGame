@@ -19,18 +19,32 @@ const int dirs[4][2] = {//wasd
 };
 
 inline void showTreasureBox(TreasureBoxInMap& it) {
-	system("cls");
-    for (int i = 0;i < it.treasureBox.allMaterial.size();i++) {
-        std::cout << "獲得了 : " << it.treasureBox.allMaterial[i].getName() << "(" << it.treasureBox.allMaterial[i].getDesc() << ")" << std::endl;
+    system("cls");
+    bool hasLoot = false;
+
+    for (auto& mat : it.treasureBox.ecMaterial) {
+        std::cout << "獲得了: Material"
+            << mat.getName() << "(" << mat.getDesc() << ")" << "\n";
+        hasLoot = true;
     }
-    for (int i = 0;i < it.treasureBox.allEquip.size();i++) {
-        std::cout << "獲得了 : " << it.treasureBox.allEquip[i].getName() << "(" << it.treasureBox.allEquip[i].getDesc() << ")" << std::endl;
+    for (auto& eq : it.treasureBox.ecEquip) {
+        std::cout << "獲得了: Equipment"
+            << eq.getName() << "(" << eq.getDesc() << ")" << "\n";
+        hasLoot = true;
     }
-    for (int i = 0;i < it.treasureBox.allMiseryItem.size();i++) {
-        std::cout << "獲得了 : " << it.treasureBox.allMiseryItem[i].getName() << "(" << it.treasureBox.allMiseryItem[i].getDesc() << ")" << std::endl;
+    for (auto& mi : it.treasureBox.ecMiseryItem) {
+        std::cout << "獲得了: MiseryItem"
+            << mi.getName() << "(" << mi.getDesc() << ")" << "\n";
+        hasLoot = true;
     }
-	std::system("pause");
+
+    if (!hasLoot) {
+        std::cout << "寶箱是空的，什麼都沒找到...\n";
+    }
+    system("pause");
 }
+
+
 
 Manager::Manager(int w, int h)
     : maps(w, h), player("Hero") {
@@ -78,21 +92,38 @@ std::pair<int, int> Manager::pickRandomFloor() const {
     return floors[randInt(0, floors.size() - 1)];
 }
 
-void Manager::spawnEnemies(const std::vector<Enemy>& prototypes, int maxNum) {
+
+void Manager::spawnEnemies(const std::vector<Enemy>& prototypes, int maxNum, int floor) {
     const auto& grid = maps.getMap();
     int H = grid.size(), W = grid[0].size();
     int tries = 0;
+
+    // 建立樓層依賴的抽取池
+    std::vector<const Enemy*> weightedPool;
+    for (const auto& e : prototypes) {
+        // 樓層越高，rank 高的敵人機率就越大
+        int weight = std::max(0, (floor + 2) - e.getrank() * 2);
+        for (int i = 0; i < weight; ++i) {
+            weightedPool.push_back(&e);
+        }
+    }
+    if (weightedPool.empty()) return;
+
     while ((int)enemies.size() < maxNum && ++tries < 10000) {
         int x = std::rand() % W;
         int y = std::rand() % H;
         auto pos = std::make_pair(x, y);
         if (grid[y][x] != FLOOR || EnemyInMap::allPos.count(pos) || pos == playerPos)
             continue;
-        const Enemy& proto = prototypes[std::rand() % prototypes.size()];
-        enemies.push_back({ proto, pos });
+
+        const Enemy& proto = *weightedPool[std::rand() % weightedPool.size()];
+        Enemy scaled = proto;
+        scaled.upgrageByFloor(floor);  // 這是重點：樓層加強
+        enemies.push_back({ scaled, pos });
         EnemyInMap::allPos.insert(pos);
     }
 }
+
 
 void Manager::spawnMerchants(int count, const std::string& merchantDataPath) {
     const auto& grid = maps.getMap();
@@ -280,7 +311,8 @@ void Manager::putTextureBox(int numbers)
         if (grid[y][x] != FLOOR || EnemyInMap::allPos.count(pos) || pos == playerPos || MerchantInMap::allPos.count(pos))
             continue;
         TreasureBox box;
-        box.randomset(numbers);
+        if (!box.randomset(numbers))
+            continue;
 		treasureBoxes.push_back({ box, pos });
 		TreasureBoxInMap::allPos.insert(pos);
         spawned++;
@@ -288,24 +320,32 @@ void Manager::putTextureBox(int numbers)
 }
 
 void Manager::IsOpenTreasureBox() {
-    // 使用迭代器遍歷並在找到後 erase
     for (auto it = treasureBoxes.begin(); it != treasureBoxes.end(); ++it) {
         if (it->pos == playerPos) {
-            // 發放內容
-            for (auto& mat : it->treasureBox.allMaterial)
+            
+            for (auto& mat : it->treasureBox.ecMaterial)
                 player.getMaterial(mat);
-            for (auto& eq : it->treasureBox.allEquip)
+            for (auto& eq : it->treasureBox.ecEquip)
                 player.getEquip(eq);
-            for (auto& mi : it->treasureBox.allMiseryItem)
+            for (auto& mi : it->treasureBox.ecMiseryItem)
                 player.getMyseryItem(mi);
+
+            
+            std::cout << "[Debug] 玩家當前裝備數量: "
+                << player.getEquipSize() << "\n";
+            system("pause");
+
+            
             showTreasureBox(*it);
-            // 刪除此寶箱
+
+            
             treasureBoxes.erase(it);
-			TreasureBoxInMap::allPos.erase(playerPos);
+            TreasureBoxInMap::allPos.erase(playerPos);
             break;
         }
     }
 }
+
 
 
 void Manager::nextMap() {
