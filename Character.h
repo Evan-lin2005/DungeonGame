@@ -148,6 +148,7 @@ public:
     std::string getSkillName() const;
 	std::vector<Material> getFallBackpack() const;
     void upgrageByFloor(int floor);//隨著地下城深入而升級
+    void CritizeByPlayerLv(int lv);
 private:
     std::string Race;//種族(決定擁有技能)
     std::string name;

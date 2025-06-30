@@ -4,8 +4,11 @@
 DungeonGame::DungeonGame(int width, int height, int maxFloor)
     : WIDTH(width), HEIGHT(height), MAX_FLOOR(maxFloor),
     floor_(1), victory_(false),
-    hero_("Hero"), mgr_(width, height, hero_), boss_("Boss", "Dark", 1000000, 10000, 12400, 18000, 9999999, 10,7)
+    hero_("Hero"), mgr_(width, height, hero_)
 {
+    if (maxFloor > 6) {
+        mgr_.Shouldadjust();
+    }
     std::srand(static_cast<unsigned>(std::time(nullptr)));
     initData();
 	mgr_.spawnEnemies(pool_, rand()%(20),floor_);
@@ -34,15 +37,9 @@ void DungeonGame::initData() {
         std::exit(1);
     }
     // 載入 Boss
-    boss_ = Enemy("Boss","Dark(weak)", 500, 200, 40, 20, 0, 0,7);
-    auto tmp = loadEnemies(kBossData);
-    if (!tmp.empty()) boss_ = tmp.front();
-    boss_.learnskill(Skill("魔神化","短暫使自身化身魔神",150.f,3,150,2));
-	boss_.learnskill(Skill("魔神之怒", "對敵人造成大量傷害", 5.0f, 0, 300, 2));
+    boss_ = loadEnemies(kBossData);
 	loadTreasureBox(kTreasureBoxData);
-
     mgr_.spawnMerchants(rand() % 5 + 1, KMerchantData);
-
 }
 
 void DungeonGame::saveProgress() const {
@@ -74,8 +71,17 @@ void DungeonGame::run() {
         }
 
         if (mgr_.reachedStairs()) {
+            srand(time(NULL));
             if (floor_ == MAX_FLOOR) {
-                victory_ = Battle(mgr_.getPlayer(), boss_);
+                system("cls");
+                std::cout << "=====================警告!!!出現強烈敵對反應!!!=====================" << std::endl;
+                system("pause");
+                if (MAX_FLOOR>6) {
+                    for (auto& boss : boss_) {
+                        boss.CritizeByPlayerLv(mgr_.getPlayer().getlv());
+                    }
+                }
+                victory_ = Battle(mgr_.getPlayer(), boss_[rand() % boss_.size()]);
                 saveProgress();
                 break;
             }
