@@ -25,7 +25,7 @@ private:
 
     Player hero_;
     std::vector<Enemy> pool_;
-    Enemy boss_;
+    std::vector<Enemy> boss_;
 
     Manager mgr_;
 

@@ -63,7 +63,7 @@ Manager::Manager(int w, int h)
 }
 
 Manager::Manager(int w, int h, const Player& p)
-    : maps(w, h), player(p) {
+    : maps(w, h), player(p),addjust(false) {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
     playerPos = pickRandomFloor();
     allsearchPos.clear();
@@ -148,6 +148,10 @@ void Manager::spawnMerchants(int count, const std::string& merchantDataPath) {
 void Manager::battleIfNeeded() {
     for (auto& e : enemies) {
         if (!e.enemy.Died() && e.pos == playerPos) {
+            if (addjust)
+            {
+                e.enemy.CritizeByPlayerLv(player.getlv());
+            }
             bool win = Battle(player, e.enemy);
             if (win) {
                 EnemyInMap::allPos.erase(e.pos);
@@ -409,5 +413,10 @@ void Manager::printMap() const {
 
 Player& Manager::getPlayer() { return player; }
 const Player& Manager::getPlayer() const { return player; }
+
+void Manager::Shouldadjust()
+{
+    addjust= true;
+}
 
 

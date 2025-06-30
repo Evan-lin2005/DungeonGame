@@ -48,11 +48,13 @@ public:
     void printMap() const;
     Player& getPlayer();
     const Player& getPlayer() const;
+    void Shouldadjust();
 
 private:
     void battleIfNeeded();
     void interactIfMerchant();
     std::pair<int, int> pickRandomFloor() const;
+    bool addjust;
 
     MapGenerator maps;
     std::vector<EnemyInMap> enemies;
