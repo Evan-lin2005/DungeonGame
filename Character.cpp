@@ -1,4 +1,4 @@
-﻿#include "Character.h"
+#include "Character.h"
 
 // Player
 Player::Player(const std::string& name)
@@ -71,15 +71,17 @@ SkillResult Player::useSkill(int idx) {
     SkillResult result; // 建立回傳結果物件
     if (idx < 0 || idx >= BattleSkills.size()) return result;
 
-    const Skill& s = BattleSkills[idx];
+    Skill& s = BattleSkills[idx];
     if (currMp < s.costPower) return result; // 魔力不足，直接回傳空結果
 
     currMp = std::max(currMp - s.costPower, 0);
 
+    s.Power *= (1 + 0.05 * lv);//技能會受等級影響
+
     // 處理有持續效果的技能
     if (s.affectRound > 0) {
         // 建立效果物件，並由 result 的指標持有
-        result.effect = std::make_unique<Effect>(s.Desc + "效果", 0, 0, 0, 0, 0,s.affectRound);
+        result.effect = std::make_unique<Effect>(s.Desc + u8"效果", 0, 0, 0, 0, 0,s.affectRound);
 
         // 根據技能類型，決定效果內容與目標
         switch (s.Type) {
@@ -249,7 +251,10 @@ bool Player::canEquip() const
     return Equips.size() <= MaxEquipCapacity;
 }
 
-
+// Player::getEquips
+const std::vector<Equip>& Player::getEquips() const {
+    return Equips;
+}
 
 
 std::string Player::getname() const { return name; }
@@ -359,14 +364,14 @@ void Player::getMyseryItem(const MiseryItem& item)
 	}
 }
 
-void Player::throwMyseryItem(const MiseryItem& item)
-{
+void Player::throwMyseryItem(const MiseryItem& item) {
     auto it = MyseryBackpack.find(item.getName());
     if (it != MyseryBackpack.end()) {
-        // 不會產生新的 default‐constructed MiseryItem
-        it->second.amount--;
-        if (it->second.amount <= 0)
+        if (it->second.amount > 1) {
+            it->second.amount--;
+        } else {
             MyseryBackpack.erase(it);
+        }
     }
 }
 
@@ -462,13 +467,13 @@ static const std::unordered_map<std::string, std::vector<Skill>> kEnemySkillTabl
         Skill("龍鱗護體", "增強自身防禦", 20.0f, 3, 6, 3),
         Skill("怒吼", "威嚇敵人降低其防禦", 15.0f, 2, 5, 8),
         Skill("龍翼掃擊", "用龍翼掃擊前方敵人造成傷害", 1.8f, 0, 8, 2),
-        Skill("熔岩爆擊", "召喚岩漿爆擊敵人造成持續傷害", 3.0f, 3,10, 6)
+        Skill("熔岩爆擊", "召喚岩漿爆擊敵人造成持續傷害", 15.0f, 3,10, 6)
     }},
     { "不死族", {
         Skill("腐爛毒液", "中毒造成持續傷害", 10.0f, 3, 5, 6),
         Skill("再生", "回復生命每回合", 8.0f, 3, 4, 1),
         Skill("骷髏之盾", "增加防禦力", 15.0f, 2, 4, 3),
-        Skill("靈魂抽離", "吸取敵人生命轉為己用", 5.0f, 0, 7, 1),
+        Skill("靈魂抽離", "吸取敵人生命轉為己用", 5.0f, 3, 7, 1),
         Skill("灰燼爆裂", "爆裂灰燼對範圍敵人造成傷害", 2.0f, 0, 8, 2)
     }},
     { "鬥士", {
@@ -490,9 +495,9 @@ static const std::unordered_map<std::string, std::vector<Skill>> kEnemySkillTabl
     { "元素精靈", {
         Skill("火焰衝擊", "釋放火焰能量對敵人造成傷害", 2.0f, 0, 8, 2),
         Skill("冰霜護盾", "創建冰霜護盾增加防禦", 15.0f, 3, 6, 3),
-        Skill("閃電鏈", "召喚閃電鏈攻擊多個目標", 1.0f, 0,10, 2),
+        Skill("閃電鏈", "召喚閃電鏈攻擊多個目標", 1.5f, 0,10, 2),
         Skill("大地之力", "提升自身生命上限", 20.0f, 0, 5, 1),
-        Skill("元素轉生", "回復自身部分生命並解除負面效果", 25.0f, 0,12, 1)
+        Skill("元素轉生", "回復自身部分生命並解除負面效果", 25.0f, 3,12, 1)
     }},
     // 新增種族：暗影刺客
     { "暗影刺客", {
@@ -529,43 +534,61 @@ static const std::unordered_map<std::string, std::vector<Skill>> kEnemySkillTabl
 };
 
 // --- 2. 各種族的掉落素材候選清單（完全硬編碼） ---
+// Character.cpp
+
+#include "Item.h"  // Material 定義
+
 static const std::unordered_map<std::string, std::vector<Material>> kEnemyMaterialTable = {
     { "哥布林", {
-        Material("葉子", "綠色葉片", 0, 1),
-        Material("木枝", "普通木頭", 0, 2)
-      }
-    },
+        Material("葉子",    "綠色葉片", 0, 1),
+        Material("木枝",    "普通木頭", 0, 2)
+    }},
     { "史萊姆", {
-        Material("黏液", "滑滑的黏液", 1, 1),
-        Material("殘骸", "破碎的殘骸", 1, 1)
-      }
-    },
+        Material("黏液",    "滑滑的黏液", 1, 1),
+        Material("殘骸",    "破碎的殘骸", 1, 1)
+    }},
     { "猛獸", {
-        Material("獸皮", "厚重獸皮", 2, 1),
-        Material("獸骨", "堅硬獸骨", 2, 1)
-      }
-    },
+        Material("獸皮",    "厚重獸皮", 2, 1),
+        Material("獸骨",    "堅硬獸骨", 2, 1)
+    }},
     { "龍", {
-        Material("龍鱗", "堅硬龍鱗", 4, 1),
-        Material("龍爪", "強韌龍爪", 4, 1)
-      }
-    },
+        Material("龍鱗",    "堅硬龍鱗", 4, 1),
+        Material("龍爪",    "強韌龍爪", 4, 1)
+    }},
     { "不死族", {
-        Material("骨頭", "骸骨碎片", 1, 1),
-        Material("腐肉", "腐爛肉塊", 1, 1)
-      }
-    },
+        Material("骨頭",    "骸骨碎片", 1, 1),
+        Material("腐肉",    "腐爛肉塊", 1, 1)
+    }},
     { "鬥士", {
-        Material("徽章",       "戰士徽章", 2, 1),
-        Material("鋼劍碎片",   "鋼劍殘片", 2, 1)
-      }
-    },
+        Material("徽章",       "戰士徽章",    2, 1),
+        Material("鋼劍碎片",   "鋼劍殘片",    2, 1)
+    }},
     { "鳥族", {
-        Material("鳥羽",   "輕盈羽毛", 1, 2),
-        Material("鳥爪",   "銳利鳥爪", 1, 1)
-      }
-    }
+        Material("鳥羽",    "輕盈羽毛", 1, 2),
+        Material("鳥爪",    "銳利鳥爪", 1, 1)
+    }},
+    { "元素精靈", {
+        Material("精靈之息", "元素殘存",    2, 1),
+        Material("魔核",     "元素核心",    2, 1)
+    }},
+    { "暗影刺客", {
+        Material("暗夜匕首", "暗影族專武",  4, 1),
+        Material("劇毒小瓶", "特級危險物品",4, 1)
+    }},
+    { "石像鬼", {
+        Material("石鬼遺骸", "高級建築材料",1, 1),
+        Material("石眼",     "真視藥水必需",1, 1)
+    }},
+    { "巨人", {
+        Material("巨靈圖騰", "巨靈戰士之徽",2, 1),
+        Material("鐵牙",     "巨型加工物",  2, 1)
+    }},
+    { "魔像", {
+        Material("核心",     "文明結晶",    1, 2),
+        Material("超級燃料", "魔像的驅動力",1, 1)
+    }}
 };
+
 
 // --- 3. Enemy 建構子：自動學習技能並隨機掉落素材 ---
 Enemy::Enemy(const std::string& race,
@@ -674,7 +697,7 @@ SkillResult Enemy::Attack(Player& player) {
 
     // 6. 持續效果 (含 Debuff 6~9)
     if (chosen->affectRound > 0) {
-        result.effect =  std::make_unique<Effect>(chosen->Desc + " 效果",
+        result.effect =  std::make_unique<Effect>(chosen->Desc + u8"效果",
             0, 0, 0, 0,0,
             chosen->affectRound);
         if (chosen->Type >= 6 ) {
@@ -779,13 +802,15 @@ void Enemy::Affected() {
 
 bool Enemy::Died() const { return HP <= 0; }
 int Enemy::Giveexp() const { return expGain; }
+int Enemy::getMaxhp() const{return MaxHp;}
+int Enemy::getMaxmp() const{return MaxMp;}
 int Enemy::gethp() const { return HP; }
 int Enemy::getmp() const { return mp; }
 int Enemy::getatk() const { return Atk; }
 int Enemy::getdef() const { return Def; }
 int Enemy::getrank() const { return rank; }
 float Enemy::getMissRate()const { return MissRate; }
-std::string Enemy::getSkillName() const { return Skillidx == -1 ? "攻擊" : Skills[Skillidx].Name; }
+std::string Enemy::getSkillName() const { return Skillidx == -1 ? u8"攻擊" : Skills[Skillidx].Name; }
 std::string Enemy::getRace() const
 {return Race;}
 
@@ -802,4 +827,16 @@ void Enemy::upgrageByFloor(int floor)// 每層提升10%
 	Atk = Atk *= (1 + (0.1 * floor));
 	Def = Def *= (1 + (0.1 * floor));
 	expGain = expGain * (1 + (0.1 * floor)); 
+}
+
+void Enemy::CritizeByPlayerLv(int lv)
+{
+    MaxHp += lv * 5;
+    MaxMp += lv * 4;
+    Atk += lv * 3;
+    Def += lv * 3;
+    for (auto s : Skills) {
+        s.Power *= (1 + lv * 0.05);
+    }
+    expGain *= (1 + float(lv / 100.0));
 }

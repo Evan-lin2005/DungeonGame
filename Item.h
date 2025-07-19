@@ -4,7 +4,7 @@
 
 constexpr int MaxEquipCapacity = 20;
 
-// ª««~µ}¦³«×
+// ç‰©å“ç¨€æœ‰åº¦
 enum class Arity {
     common,
     good,
@@ -30,32 +30,32 @@ inline Arity ArityFromInt(int r) {
     }
 }
 
-//®i¥Üµ}¦³«×
+//å±•ç¤ºç¨€æœ‰åº¦
 inline void showRare(Arity a) {
     switch (a) {
     case Arity::common:
-        std::cout << "´¶³q ";
+        std::cout << "æ™®é€š ";
         break;
     case Arity::good:
-        std::cout << "¨}¦n ";
+        std::cout << "è‰¯å¥½ ";
         break;
     case Arity::rare:
-        std::cout << "µ}¦³ ";
+        std::cout << "ç¨€æœ‰ ";
         break;
     case Arity::special:
-        std::cout << "¯S»s ";
+        std::cout << "ç‰¹è£½ ";
         break;
     case Arity::master:
-        std::cout << "¤j®v ";
+        std::cout << "å¤§å¸« ";
         break;
     case Arity::legendary:
-        std::cout << "¥v¸Ö ";
+        std::cout << "å²è©© ";
         break;
     case Arity::mythical:
-        std::cout << "¯«¸Ü ";
+        std::cout << "ç¥è©± ";
         break;
     case Arity::Only:
-        std::cout << "¤£¦´";
+        std::cout << "ä¸æœ½";
         break;
     }
 }
@@ -67,14 +67,14 @@ public:
 
     Arity arity;
 
-    // «Øºc¤l¡G¨Ï¥Î¾ã¼Æ rank
+    // å»ºæ§‹å­ï¼šä½¿ç”¨æ•´æ•¸ rank
     Item(const std::string& name = "None",
         const std::string& desc = "None",
         int rank = 0)
         : name(name), desc(desc), arity(ArityFromInt(rank)) {
     }
 
-    // «Øºc¤l¡G¨Ï¥Î Arity
+    // å»ºæ§‹å­ï¼šä½¿ç”¨ Arity
     Item(const std::string& name,
         const std::string& desc,
         Arity rank)
@@ -92,7 +92,7 @@ public:
     int affectHp, affectAtk, affectDef, affectMp;
     bool used = false;
 
-    // «Øºc¤l¡G¾ã¼Æ rank
+    // å»ºæ§‹å­ï¼šæ•´æ•¸ rank
     Equip(const std::string& name,
         const std::string& desc,
         int rank,
@@ -102,7 +102,7 @@ public:
         affectDef(adef), affectMp(amp) {
     }
 
-    // «Øºc¤l¡GArity
+    // å»ºæ§‹å­ï¼šArity
     Equip(const std::string& name,
         const std::string& desc,
         Arity rank,
@@ -117,15 +117,15 @@ struct Money : public Item {
 public:
     int Gold, Sliver, Cooper;
 
-    // «Øºc¤l¡G¾ã¼Æ rank
-    Money(const std::string& name = "³q¥Î³f¹ô",
-        const std::string& desc = "100»É¹ô=1»È,100»È=1ª÷",
+    // å»ºæ§‹å­ï¼šæ•´æ•¸ rank
+    Money(const std::string& name = "é€šç”¨è²¨å¹£",
+        const std::string& desc = "100éŠ…å¹£=1éŠ€,100éŠ€=1é‡‘",
         int rank = 0,
         int gold = 0, int sliver = 0, int cooper = 0)
         : Item(name, desc, rank), Gold(gold), Sliver(sliver), Cooper(cooper) {
     }
 
-    // «Øºc¤l¡GArity
+    // å»ºæ§‹å­ï¼šArity
     Money(const std::string& name,
         const std::string& desc,
         Arity rank,
@@ -133,9 +133,9 @@ public:
         : Item(name, desc, rank), Gold(gold), Sliver(sliver), Cooper(cooper) {
     }
 
-    // «Øºc¤l¡G¥u¶Çª÷ÃB
+    // å»ºæ§‹å­ï¼šåªå‚³é‡‘é¡
     Money(int gold, int sliver, int cooper)
-        : Item("³q¥Î³f¹ô", "", Arity::common), Gold(gold), Sliver(sliver), Cooper(cooper) {
+        : Item("é€šç”¨è²¨å¹£", "", Arity::common), Gold(gold), Sliver(sliver), Cooper(cooper) {
     }
 };
 
@@ -145,7 +145,7 @@ public:
 
 	Material() :Item(), amount(1) {}
 
-    // «Øºc¤l¡G¾ã¼Æ rank
+    // å»ºæ§‹å­ï¼šæ•´æ•¸ rank
     Material(const std::string& name ,
         const std::string& desc ,
         int rank = 0,
@@ -153,7 +153,7 @@ public:
         : Item(name, desc, rank), amount(amount) {
     }
 
-    // «Øºc¤l¡GArity
+    // å»ºæ§‹å­ï¼šArity
     Material(const std::string& name,
         const std::string& desc,
         Arity rank,
@@ -171,7 +171,7 @@ public:
 
 	MiseryItem() : Item(), itemEffect(), amount(1) {}
 
-    // «Øºc¤l¡G¾ã¼Æ rank
+    // å»ºæ§‹å­ï¼šæ•´æ•¸ rank
     MiseryItem(const std::string& name,
         const std::string& desc,
         int rank,
@@ -180,7 +180,7 @@ public:
         : Item(name, desc, rank), itemEffect(effect), amount(amount) {
     }
 
-    // «Øºc¤l¡GArity
+    // å»ºæ§‹å­ï¼šArity
     MiseryItem(const std::string& name,
         const std::string& desc,
         Arity rank,

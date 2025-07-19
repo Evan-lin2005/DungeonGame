@@ -1,138 +1,155 @@
 #include "Merchant.h"
 #include <cctype>
 
-void Merchant::Interact(Player& p)
-{
-	system("cls");
+void Merchant::Interact(Player& p) {
+    // èˆŠç‰ˆconsoleå°ˆç”¨ï¼Œå·²æ£„ç”¨
+}
+
+void Merchant::Interact(Player& p, MerchantUI& ui) {
 	if (type == MerchantType::Material) {
-		std::cout << "Åwªï¨Ó¨ì§÷®Æ°Ó©±¡I" << std::endl;
-		std::cout << "³o¸Ì¦³¦UºØ§÷®Æ¨Ñ§AÁÊ¶R¡C" << std::endl;
-		showGoods();
-		std::cin.clear();
-		std::cin.sync();
-		std::cout << "½Ð¿ï¾Ü§A·QÁÊ¶R©Î¥X°âªº§÷®Æ¡A¿é¤J¹ïÀ³ªº½s¸¹¡G(¿é¤J(Q/q)Â÷¶}°Ó©±)" << std::endl;
-		std::cout << "¥Ø«e¾Ö¦³ª÷¿ú" <<"ª÷¹ô: "<< p.showmoney().Gold <<" »È¹ô: " << p.showmoney().Sliver << " »É¹ô: "<< p.showmoney().Cooper << std::endl;
+        ui.showTitle("æ­¡è¿Žä¾†åˆ°ææ–™å•†åº—ï¼");
+        std::vector<std::string> names, descs, prices;
+        for (auto& item : MaterialList) {
+            names.push_back(item.material.getName());
+            descs.push_back(item.material.getDesc());
+            prices.push_back(
+                (item.price.Gold ? std::to_string(item.price.Gold) + "é‡‘ " : "") +
+                (item.price.Sliver ? std::to_string(item.price.Sliver) + "éŠ€ " : "") +
+                (item.price.Cooper ? std::to_string(item.price.Cooper) + "éŠ…" : "")
+            );
+        }
+        ui.showGoods(names, descs, prices);
+        ui.showMoney(p.showmoney());
 		while (true) {
-			std::string input;
-			std::cin >> input;
-			if (input == "Q" || input == "q") {
-				std::cout << "·PÁÂ¥úÁ{¡AÅwªï¤U¦¸¦A¨Ó¡I" << std::endl;
-				break;
-			}
-			bool legal = true;
-			for (char c : input) {
-				if (!isdigit(c)) {
-					std::cout << "«È¤H,½Ð¿é¤J¥¿½Tªº½s¸¹¡G" << std::endl;
-					legal = false;
-					break;
-				}
-			}
-			if (!legal) continue;
-			int choose = stoi(input);
-			if (choose < 0 || choose >= MaterialList.size()) {
-				std::cout << "«È¤H,¥»©±¨S¦³³o¶µ°Ó«~¡G" << std::endl;
-				continue;
-			}
-			std::cout << "½Ð°Ý¬O­n¥X°â©ÎÁÊ¶R" << std::endl;
-			std::string action;
-			std::cin >> action;
-			if (action != "ÁÊ¶R" && action != "¥X°â") {
-				std::cout << "«È¤H,½Ð¿é¤J¥¿½Tªº¾Þ§@(ÁÊ¶R/¥X°â)¡G" << std::endl;
-				continue;
-			}
-			if (action == "¥X°â") {
+            int choose = ui.selectGoods((int)MaterialList.size());
+            if (choose < 0 || choose >= (int)MaterialList.size()) break;
+            std::string action = ui.selectAction({u8"è³¼è²·", u8"å‡ºå”®"});
+            if (action == u8"å‡ºå”®") {
 				std::vector<Material> materials;
 				materials.push_back(MaterialList[choose].material);
 				if (p.HaveEnoughMaterial(materials)) {
 					p.throwMaterial(MaterialList[choose].material);
 					p.earnmoney(MaterialList[choose].price);
-					std::cout << "«È¤H,±z¤w¦¨¥\¥X°â " << MaterialList[choose].material.getName() << " x" << MaterialList[choose].material.amount << "¡C" << std::endl;
+                    ui.showTip("æ‚¨å·²æˆåŠŸå‡ºå”® " + MaterialList[choose].material.getName() + " x" + std::to_string(MaterialList[choose].material.amount));
+                } else {
+                    ui.showTip("æ‚¨æ²’æœ‰è¶³å¤ çš„ææ–™ä¾†å‡ºå”®ã€‚");
 				}
-				else {
-					std::cout << "«È¤H,±z¨S¦³¨¬°÷ªº§÷®Æ¨Ó¥X°â¡C" << std::endl;
-				}
-				continue;
-			}
-			else {
+                ui.wait();
+            } else if (action == u8"è³¼è²·") {
 				if (p.HaveEnoughMoney(MaterialList[choose].price)) {
 					p.spendmoney(MaterialList[choose].price);
 					p.getMaterial(MaterialList[choose].material);
-					std::cout << "«È¤H,±z¤w¦¨¥\ÁÊ¶R " << MaterialList[choose].material.getName() << " x" << MaterialList[choose].material.amount << "¡C" << std::endl;
+                    ui.showTip("æ‚¨å·²æˆåŠŸè³¼è²· " + MaterialList[choose].material.getName() + " x" + std::to_string(MaterialList[choose].material.amount));
 					MaterialList.erase(MaterialList.begin() + choose);
+                } else {
+                    ui.showTip("æ‚¨çš„éŒ¢ä¸è¶³ä»¥è²·ä¸‹é€™ä»½å•†å“ã€‚");
+                }
+                ui.wait();
+            } else {
+                break;
+            }
+            // æ›´æ–°å•†å“èˆ‡é‡‘éŒ¢é¡¯ç¤º
+            names.clear(); descs.clear(); prices.clear();
+            for (auto& item : MaterialList) {
+                names.push_back(item.material.getName());
+                descs.push_back(item.material.getDesc());
+                prices.push_back(
+                    (item.price.Gold ? std::to_string(item.price.Gold) + "é‡‘ " : "") +
+                    (item.price.Sliver ? std::to_string(item.price.Sliver) + "éŠ€ " : "") +
+                    (item.price.Cooper ? std::to_string(item.price.Cooper) + "éŠ…" : "")
+                );
 				}
-				else {
-					std::cout << "«È¤H,±zªº¿ú¤£¨¬¥H¶R¤U³o¥÷°Ó«~¡C" << std::endl;
-				}
-			}
-			
+            ui.showGoods(names, descs, prices);
+            ui.showMoney(p.showmoney());
 		}
-	}
-	else if (type == MerchantType::Equipment) {
-		std::cout << "Åwªï¨Ó¨ì¸Ë³Æ°Ó©±¡I" << std::endl;
-		std::cout << "³o¸Ì¦³¦UºØ¸Ë³Æ¨Ñ§AÁÊ¶R¡C" << std::endl;
-		showGoods();
-		std::cout << "½Ð¿ï¾Ü§A·QÁÊ¶Rªº¸Ë³Æ¡A¿é¤J¹ïÀ³ªº½s¸¹¡G(¿é¤J(Q/q)Â÷¶}°Ó©±)" << std::endl;
-		std::cout << "¥Ø«e¾Ö¦³ª÷¿ú" << "ª÷¹ô: " << p.showmoney().Gold << " »È¹ô: " << p.showmoney().Sliver << " »É¹ô: " << p.showmoney().Cooper << std::endl;
-		while (true)
-		{
-			std::string input;
-			std::cin >> input;
-			if (input == "Q" || input == "q") {
-				std::cout << "·PÁÂ¥úÁ{¡AÅwªï¤U¦¸¦A¨Ó¡I" << std::endl;
-				break;
+    } else if (type == MerchantType::Equipment) {
+        ui.showTitle("æ­¡è¿Žä¾†åˆ°è£å‚™å•†åº—ï¼");
+        std::vector<std::string> names, descs, prices;
+        for (auto& item : EquipmentList) {
+            names.push_back(item.equip.getName());
+            descs.push_back(item.equip.getDesc());
+            std::string priceStr =
+                (item.price.Gold ? std::to_string(item.price.Gold) + "é‡‘ " : "") +
+                (item.price.Sliver ? std::to_string(item.price.Sliver) + "éŠ€ " : "") +
+                (item.price.Cooper ? std::to_string(item.price.Cooper) + "éŠ…" : "");
+            for (auto& materialneed : item.NeedMaterial) {
+                priceStr += " éœ€:" + materialneed.getName() + "x" + std::to_string(materialneed.amount);
+            }
+            prices.push_back(priceStr);
 			}
-			int choose = stoi(input);
-			if (choose < 0 || choose >= EquipmentList.size()) {
-				std::cout << "«È¤H,¥»©±¨S¦³³o¶µ°Ó«~¡G" << std::endl;
-				continue;
-			}
+        ui.showGoods(names, descs, prices);
+        ui.showMoney(p.showmoney());
+        while (true) {
+            int choose = ui.selectGoods((int)EquipmentList.size());
+            if (choose < 0 || choose >= (int)EquipmentList.size()) break;
 			if (p.HaveEnoughMoney(EquipmentList[choose].price) && p.HaveEnoughMaterial(EquipmentList[choose].NeedMaterial)) {
-				if (p.HaveEnoughMoney(EquipmentList[choose].price)) {
 					p.spendmoney(EquipmentList[choose].price);
 					p.getEquip(EquipmentList[choose].equip);
 					for (auto& material : EquipmentList[choose].NeedMaterial) {
 						p.throwMaterial(material);
 					}
-					std::cout << "«È¤H,±z¤w¦¨¥\ÁÊ¶R " << EquipmentList[choose].equip.getName() << "¡C" << std::endl;
-					p.getEquip(EquipmentList[choose].equip);
+                ui.showTip("æ‚¨å·²æˆåŠŸè³¼è²· " + EquipmentList[choose].equip.getName());
 					EquipmentList.erase(EquipmentList.begin() + choose);
-				}
-				else {
-					std::cout << "«È¤H,±zªº§÷®Æ¤£¨¬¥H¶R¤U³o¥÷°Ó«~¡C" << std::endl;
-				}
-			}
-			else {
-				std::cout << "«È¤H,±zªº¿ú¤£¨¬¥H¶R¤U³o¥÷°Ó«~¡C" << std::endl;
-			}
-		}
-	}
-	else {
-		std::cout << "Åwªï¨Ó¨ì¹D¨ã°Ó©±¡I" << std::endl;
-		std::cout << "³o¸Ì¦³¦UºØ¹D¨ã¨Ñ§AÁÊ¶R¡C" << std::endl;
-		showGoods();
-		std::cout << "½Ð¿ï¾Ü§A·QÁÊ¶Rªº¹D¨ã¡A¿é¤J¹ïÀ³ªº½s¸¹¡G(¿é¤J(Q/q)Â÷¶}°Ó©±)" << std::endl;
-		std::cout << "¥Ø«e¾Ö¦³ª÷¿ú" << "ª÷¹ô: " << p.showmoney().Gold << " »È¹ô: " << p.showmoney().Sliver << " »É¹ô: " << p.showmoney().Cooper << std::endl;
+            } else {
+                ui.showTip("æ‚¨çš„éŒ¢æˆ–ææ–™ä¸è¶³ä»¥è²·ä¸‹é€™ä»½å•†å“ã€‚");
+            }
+            ui.wait();
+            // æ›´æ–°å•†å“èˆ‡é‡‘éŒ¢é¡¯ç¤º
+            names.clear(); descs.clear(); prices.clear();
+            for (auto& item : EquipmentList) {
+                names.push_back(item.equip.getName());
+                descs.push_back(item.equip.getDesc());
+                std::string priceStr =
+                    (item.price.Gold ? std::to_string(item.price.Gold) + "é‡‘ " : "") +
+                    (item.price.Sliver ? std::to_string(item.price.Sliver) + "éŠ€ " : "") +
+                    (item.price.Cooper ? std::to_string(item.price.Cooper) + "éŠ…" : "");
+                for (auto& materialneed : item.NeedMaterial) {
+                    priceStr += " éœ€:" + materialneed.getName() + "x" + std::to_string(materialneed.amount);
+                }
+                prices.push_back(priceStr);
+            }
+            ui.showGoods(names, descs, prices);
+            ui.showMoney(p.showmoney());
+        }
+    } else if (type == MerchantType::Misery) {
+        ui.showTitle("æ­¡è¿Žä¾†åˆ°é“å…·å•†åº—ï¼");
+        std::vector<std::string> names, descs, prices;
+        for (auto& item : MiseryList) {
+            names.push_back(item.misery.getName());
+            descs.push_back(item.misery.getDesc());
+            prices.push_back(
+                (item.price.Gold ? std::to_string(item.price.Gold) + "é‡‘ " : "") +
+                (item.price.Sliver ? std::to_string(item.price.Sliver) + "éŠ€ " : "") +
+                (item.price.Cooper ? std::to_string(item.price.Cooper) + "éŠ…" : "")
+            );
+        }
+        ui.showGoods(names, descs, prices);
+        ui.showMoney(p.showmoney());
 		while (true) {
-			std::string input;
-			std::cin >> input;
-			if (input == "Q" || input == "q") {
-				std::cout << "·PÁÂ¥úÁ{¡AÅwªï¤U¦¸¦A¨Ó¡I" << std::endl;
-				break;
-			}
-			int choose = stoi(input);
-			if (choose < 0 || choose >= MiseryList.size()) {
-				std::cout << "«È¤H,¥»©±¨S¦³³o¶µ°Ó«~¡G" << std::endl;
-				continue;
-			}
+            int choose = ui.selectGoods((int)MiseryList.size());
+            if (choose < 0 || choose >= (int)MiseryList.size()) break;
 			if (p.HaveEnoughMoney(MiseryList[choose].price)) {
 				p.spendmoney(MiseryList[choose].price);
 				p.getMyseryItem(MiseryList[choose].misery);
-				std::cout << "«È¤H,±z¤w¦¨¥\ÁÊ¶R " << MiseryList[choose].misery.getName() << "¡C" << std::endl;
+                ui.showTip("æ‚¨å·²æˆåŠŸè³¼è²· " + MiseryList[choose].misery.getName());
 				MiseryList.erase(MiseryList.begin() + choose);
+            } else {
+                ui.showTip("æ‚¨çš„éŒ¢ä¸è¶³ä»¥è²·ä¸‹é€™ä»½å•†å“ã€‚");
+            }
+            ui.wait();
+            // æ›´æ–°å•†å“èˆ‡é‡‘éŒ¢é¡¯ç¤º
+            names.clear(); descs.clear(); prices.clear();
+            for (auto& item : MiseryList) {
+                names.push_back(item.misery.getName());
+                descs.push_back(item.misery.getDesc());
+                prices.push_back(
+                    (item.price.Gold ? std::to_string(item.price.Gold) + "é‡‘ " : "") +
+                    (item.price.Sliver ? std::to_string(item.price.Sliver) + "éŠ€ " : "") +
+                    (item.price.Cooper ? std::to_string(item.price.Cooper) + "éŠ…" : "")
+                );
 			}
-			else {
-				std::cout << "«È¤H,±zªº¿ú¤£¨¬¥H¶R¤U³o¥÷°Ó«~¡C" << std::endl;
-			}
+            ui.showGoods(names, descs, prices);
+            ui.showMoney(p.showmoney());
 		}
 	}
 }
@@ -162,43 +179,43 @@ void Merchant::showGoods()
 {
 	if (type == MerchantType::Material) {
 		for (auto& item : MaterialList) {
-			std::cout << "¦WºÙ : " << item.material.getName() << " --- " << item.material.getDesc() << " »ù®æ : ";
+			std::cout << "åç¨± : " << item.material.getName() << " --- " << item.material.getDesc() << " åƒ¹æ ¼ : ";
 			showRare(item.material.arity);
 			if (item.price.Gold != 0) {
-				std::cout << item.price.Gold << " ª÷¹ô ";
+				std::cout << item.price.Gold << " é‡‘å¹£ ";
 			}
 			if (item.price.Sliver != 0) {
-				std::cout << item.price.Sliver << " »È¹ô ";
+				std::cout << item.price.Sliver << " éŠ€å¹£ ";
 			}
 			if (item.price.Cooper != 0) {
-				std::cout << item.price.Cooper << " »É¹ô ";
+				std::cout << item.price.Cooper << " éŠ…å¹£ ";
 			}
 			std::cout << std::endl;
 		}
 	}
 	else if (type == MerchantType::Equipment) {
 		for (auto& item : EquipmentList) {
-			std::cout << "¦WºÙ : " << item.equip.getName() << " --- " << item.equip.getDesc() << " µ}¦³«× : ";
+			std::cout << "åç¨± : " << item.equip.getName() << " --- " << item.equip.getDesc() << " ç¨€æœ‰åº¦ : ";
 			showRare(item.equip.arity);
-			std::cout << " »ù®æ : ";
+			std::cout << " åƒ¹æ ¼ : ";
 			if (item.price.Gold != 0) {
-				std::cout << item.price.Gold << " ª÷¹ô ";
+				std::cout << item.price.Gold << " é‡‘å¹£ ";
 			}
 			if (item.price.Sliver != 0) {
-				std::cout << item.price.Sliver << " »È¹ô ";
+				std::cout << item.price.Sliver << " éŠ€å¹£ ";
 			}
 			if (item.price.Cooper != 0) {
-				std::cout << item.price.Cooper << " »É¹ô ";
+				std::cout << item.price.Cooper << " éŠ…å¹£ ";
 			}
 			for (auto& materialneed : item.NeedMaterial) {
-				std::cout << "»Ý­n§÷®Æ : " << materialneed.getName() << " x" << materialneed.amount << " ";
+				std::cout << "éœ€è¦ææ–™ : " << materialneed.getName() << " x" << materialneed.amount << " ";
 			}
 			std::cout << std::endl;
 		}
 	}
 	else if (type == MerchantType::Misery) {
 		for (auto& Item : MiseryList) {
-			std::cout << "¦WºÙ : " << Item.misery.getName() << " --- " << Item.misery.getDesc() << " »ù®æ : ";
+			std::cout << "åç¨± : " << Item.misery.getName() << " --- " << Item.misery.getDesc() << " åƒ¹æ ¼ : ";
 			showRare(Item.misery.arity);
 			std::cout<<std::endl;
 		}

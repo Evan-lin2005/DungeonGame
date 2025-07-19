@@ -1,8 +1,8 @@
 #pragma once
-// ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
-// Enemy  ¦æ¡Gname hp mp atk def exp missrate
-// Player ¦æ¡Gname lv exp hp mp atk def missrate
-// ¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Enemy  è¡Œï¼šname hp mp atk def exp missrate
+// Player è¡Œï¼šname lv exp hp mp atk def missrate
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 #include "Character.h"
 #include "Merchant.h"
 #include "treasurebox.h"
@@ -12,7 +12,7 @@
 
 
 
-// =========== ¦@¥Î¡G±N¤@¦æ¤À³Î¬° token ============
+// =========== å…±ç”¨ï¼šå°‡ä¸€è¡Œåˆ†å‰²ç‚º token ============
 inline std::vector<std::string> splitTokens(const std::string& line) {
     std::istringstream iss(line);
     std::vector<std::string> tokens;
@@ -21,7 +21,7 @@ inline std::vector<std::string> splitTokens(const std::string& line) {
     return tokens;
 }
 
-// -------- ¦@¥Î¡GÅª¨ú¤U¤@¦æ¦³®Ä tokens --------
+// -------- å…±ç”¨ï¼šè®€å–ä¸‹ä¸€è¡Œæœ‰æ•ˆ tokens --------
 inline bool nextTokens(std::ifstream& in, std::vector<std::string>& out) {
     std::string line;
     out.clear();
@@ -33,7 +33,7 @@ inline bool nextTokens(std::ifstream& in, std::vector<std::string>& out) {
     return false; // EOF
 }
 
-// ================= ¼Ä¤H =================
+// ================= æ•µäºº =================
 inline Enemy makeEnemy(const std::vector<std::string>& t) {
     return Enemy(t[0],t[1], std::stoi(t[2]), std::stoi(t[3]),
         std::stoi(t[4]), std::stoi(t[5]), std::stoi(t[6]),stof(t[7]),stoi(t[8]));
@@ -46,12 +46,12 @@ inline std::vector<Enemy> loadEnemies(const std::string& path) {
 
     std::vector<std::string> tk;
     while (nextTokens(in, tk)) {
-        if (tk.size() >= 9) list.push_back(makeEnemy(tk));
+        if (tk.size() == 9) list.push_back(makeEnemy(tk));
     }
     return list;
 }
 
-// ================= ª±®a =================
+// ================= ç©å®¶ =================
 inline Player loadPlayer(const std::string& path) {
     std::ifstream in(path);
     if (!in) return Player("Hero");
@@ -70,19 +70,19 @@ inline void savePlayer(const Player& p, const std::string& path) {
         << p.getMaxHp() << ' ' << p.getMaxMp() << ' ' << p.getatk() << ' ' << p.getdef()<<' ' << p.getMissRate() << '\n';
 }
 
-//================= °Ó¤H =================
+//================= å•†äºº =================
 inline void LoadMerchantData(Merchant& m, const std::string& path) {
     std::ifstream in(path);
     if (!in) return;
 
-    // ¥Î enum °µÂ²³æªº¡uª¬ºA¾÷¡v¡A¤Á´«Åª¨ú°Ï¬q
+    // ç”¨ enum åšç°¡å–®çš„ã€Œç‹€æ…‹æ©Ÿã€ï¼Œåˆ‡æ›è®€å–å€æ®µ
     enum Section { None, MaterialSec, EquipmentSec, MysterySec } sec = None;
     std::string line;
 
     while (std::getline(in, line)) {
         if (line.empty() || line[0] == '#') continue;
 
-        // °Ï¬q¼ĞÀY
+        // å€æ®µæ¨™é ­
         if (line == "Material") { sec = MaterialSec;  continue; }
         if (line == "Equipment") { sec = EquipmentSec; continue; }
         if (line == "MysteryItem") { sec = MysterySec;   continue; }
@@ -110,7 +110,7 @@ inline void LoadMerchantData(Merchant& m, const std::string& path) {
                 >> gold >> sliver >> cooper))
                 break;
 
-            // Åª¨ú³o¥ó¸Ë³Æ©Ò»İªº¯À§÷²M³æ
+            // è®€å–é€™ä»¶è£å‚™æ‰€éœ€çš„ç´ ææ¸…å–®
             std::vector<Material> materials;
             std::string mn, md;
             int mr, ma;
@@ -154,7 +154,7 @@ inline void LoadMerchantData(Merchant& m, const std::string& path) {
     }
 }
 
-//==================Åª¨ú§Ş¯à==================
+//==================è®€å–æŠ€èƒ½==================
 inline void learnPlayerSkill(Player& p, const std::string& skillFilePath) {
     std::ifstream in(skillFilePath);
     if (!in) return;
@@ -172,7 +172,7 @@ inline void learnPlayerSkill(Player& p, const std::string& skillFilePath) {
     }
 }
 
-//==================Ä_½c==================
+//==================å¯¶ç®±==================
 inline void loadTreasureBox(const std::string& path) {
     std::ifstream in(path);
     if (!in)return;
@@ -183,7 +183,6 @@ inline void loadTreasureBox(const std::string& path) {
     while (std::getline(in, line)) {
         if (line.empty() || line[0] == '#') continue;
 
-        // °Ï¬q¼ĞÀY
         if (line == "Material") { sec = MaterialSec;  continue; }
         if (line == "Equipment") { sec = EquipmentSec; continue; }
         if (line == "MysteryItem") { sec = MysterySec;   continue; }

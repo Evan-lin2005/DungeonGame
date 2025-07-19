@@ -1,12 +1,14 @@
 // Game.cpp
 #include "DungeonGame.h"
 #include "GameAsk.h"
+bool g_useSFMLBattle = true;
 int main() {
+    srand(time(NULL));
     int h; int w; int floor;
-    GameAsk(h, w, floor);
-    std::cout << "¶i¤J¹CÀ¸" << std::endl;
-    system("paused");
+	GameAskSFML(h, w, floor);
+    std::cout << "Start" << std::endl;
+    system("pause");
     DungeonGame game(h,w,floor);
-    game.run();
+    game.runSFML();
     return 0;
 }

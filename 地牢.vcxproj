@@ -102,10 +102,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Program Files\SFML-2.6.1\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Program Files\SFML-2.6.1\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-graphics-d.lib;sfml-system-d.lib;sfml-window-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -117,10 +121,14 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Program Files\SFML-2.6.1\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Program Files\SFML-2.6.1\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-graphics.lib;sfml-system.lib;sfml-window.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -130,21 +138,27 @@
     <ClInclude Include="DungeonGame.h" />
     <ClInclude Include="Addition.h" />
     <ClInclude Include="GameAsk.h" />
+    <ClInclude Include="GameAskSFML.h" />
+    <ClInclude Include="MerchantSFML.h" />
     <ClInclude Include="treasurebox.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Manager.h" />
     <ClInclude Include="MapGenerator.h" />
     <ClInclude Include="Merchant.h" />
+    <ClInclude Include="SfmlViewer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Addition.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="DungeonGame.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameAskSFML.cpp" />
     <ClCompile Include="Manager.cpp" />
     <ClCompile Include="MapGenerator.cpp" />
     <ClCompile Include="Merchant.cpp" />
+    <ClCompile Include="MerchantSFML.cpp" />
     <ClCompile Include="treasurebox.cpp" />
+    <ClCompile Include="SfmlViewer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

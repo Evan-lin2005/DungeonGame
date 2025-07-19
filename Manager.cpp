@@ -1,10 +1,14 @@
 // Manager.cpp
 #include "Manager.h"
-#include "DataLoader.h"  // ´£¨Ñ LoadMerchantData
+#include "DataLoader.h"  //  LoadMerchantData
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
+#include "SfmlViewer.h"
+#include "MerchantSFML.h"
+#include <SFML/Graphics.hpp>
 
+extern bool g_useSFMLBattle; // åœ¨ main.cpp æˆ– DungeonGame.cpp å®šç¾©
 
 static int randInt(int a, int b) { return a + std::rand() % (b - a + 1); }
 std::set<std::pair<int, int>> Manager::allsearchPos;
@@ -23,27 +27,76 @@ inline void showTreasureBox(TreasureBoxInMap& it) {
     bool hasLoot = false;
 
     for (auto& mat : it.treasureBox.ecMaterial) {
-        std::cout << "Àò±o¤F: Material"
+        std::cout << "  o F: Material"
             << mat.getName() << "(" << mat.getDesc() << ")" << "\n";
         hasLoot = true;
     }
     for (auto& eq : it.treasureBox.ecEquip) {
-        std::cout << "Àò±o¤F: Equipment"
+        std::cout << "  o F: Equipment"
             << eq.getName() << "(" << eq.getDesc() << ")" << "\n";
         hasLoot = true;
     }
     for (auto& mi : it.treasureBox.ecMiseryItem) {
-        std::cout << "Àò±o¤F: MiseryItem"
+        std::cout << "  o F: MiseryItem"
             << mi.getName() << "(" << mi.getDesc() << ")" << "\n";
         hasLoot = true;
     }
 
     if (!hasLoot) {
-        std::cout << "Ä_½c¬OªÅªº¡A¤°»ò³£¨S§ä¨ì...\n";
+        std::cout << " _ c O Åª  A   ò³£¨S   ...\n";
     }
     system("pause");
 }
 
+void showTreasureBoxSFML(const TreasureBox& box, sf::RenderWindow& window, sf::Font& font) {
+    bool running = true;
+    while (running && window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) window.close();
+            if (event.type == sf::Event::MouseButtonPressed || event.type == sf::Event::KeyPressed)
+                running = false;
+        }
+        window.clear(sf::Color(40, 30, 10));
+        sf::Text title("ä½ æ‰“é–‹äº†å¯¶ç®±ï¼", font, 28);
+        title.setFillColor(sf::Color::Yellow);
+        title.setPosition(60, 30);
+        window.draw(title);
+        int y = 80;
+        for (const auto& mat : box.ecMaterial) {
+            std::string matStr = "ææ–™: " + mat.getName() + " - " + mat.getDesc();
+            sf::Text t(sf::String::fromUtf8(matStr.begin(), matStr.end()), font, 20);
+            t.setFillColor(sf::Color::White);
+            t.setPosition(60, y); y += 30;
+            window.draw(t);
+        }
+        for (const auto& eq : box.ecEquip) {
+            std::string eqStr = "è£å‚™: " + eq.getName() + " - " + eq.getDesc();
+            sf::Text t(sf::String::fromUtf8(eqStr.begin(), eqStr.end()), font, 20);
+            t.setFillColor(sf::Color::Cyan);
+            t.setPosition(60, y); y += 30;
+            window.draw(t);
+        }
+        for (const auto& mi : box.ecMiseryItem) {
+            std::string miStr = "é“å…·: " + mi.getName() + " - " + mi.getDesc();
+            sf::Text t(sf::String::fromUtf8(miStr.begin(), miStr.end()), font, 20);
+            t.setFillColor(sf::Color::Green);
+            t.setPosition(60, y); y += 30;
+            window.draw(t);
+        }
+        if (box.ecMaterial.empty() && box.ecEquip.empty() && box.ecMiseryItem.empty()) {
+            sf::Text t("å¯¶ç®±æ˜¯ç©ºçš„...", font, 22);
+            t.setFillColor(sf::Color::Red);
+            t.setPosition(60, y);
+            window.draw(t);
+        }
+        sf::Text ok("ï¼ˆé»žæ“Šæˆ–æŒ‰ä»»æ„éµç¹¼çºŒï¼‰", font, 18);
+        ok.setFillColor(sf::Color::White);
+        ok.setPosition(60, y + 40);
+        window.draw(ok);
+        window.display();
+    }
+}
 
 
 Manager::Manager(int w, int h)
@@ -51,7 +104,7 @@ Manager::Manager(int w, int h)
     std::srand(static_cast<unsigned>(std::time(nullptr)));
     playerPos = pickRandomFloor();
     allsearchPos.clear();
-    // ªì©l¤Æ±´¯Á½d³ò 3x3
+    //   l Æ±    d   3x3
     for (int dy = -1; dy <= 1; ++dy) {
         for (int dx = -1; dx <= 1; ++dx) {
             int x = playerPos.first + dx;
@@ -63,7 +116,7 @@ Manager::Manager(int w, int h)
 }
 
 Manager::Manager(int w, int h, const Player& p)
-    : maps(w, h), player(p) {
+    : maps(w, h), player(p),addjust(false) {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
     playerPos = pickRandomFloor();
     allsearchPos.clear();
@@ -98,10 +151,10 @@ void Manager::spawnEnemies(const std::vector<Enemy>& prototypes, int maxNum, int
     int H = grid.size(), W = grid[0].size();
     int tries = 0;
 
-    // «Ø¥ß¼Ó¼h¨Ì¿àªº©â¨ú¦À
+    //  Ø¥ß¼Ó¼h Ì¿àªº     
     std::vector<const Enemy*> weightedPool;
     for (const auto& e : prototypes) {
-        // ¼Ó¼h¶V°ª¡Arank °ªªº¼Ä¤H¾÷²v´N¶V¤j
+        //  Ó¼h V   Arank      Ä¤H   v N V j
         int weight = std::max(0, (floor + 2) - e.getrank() * 2);
         for (int i = 0; i < weight; ++i) {
             weightedPool.push_back(&e);
@@ -118,7 +171,7 @@ void Manager::spawnEnemies(const std::vector<Enemy>& prototypes, int maxNum, int
 
         const Enemy& proto = *weightedPool[std::rand() % weightedPool.size()];
         Enemy scaled = proto;
-        scaled.upgrageByFloor(floor);  // ³o¬O­«ÂI¡G¼Ó¼h¥[±j
+        scaled.upgrageByFloor(floor);  //  o O   I G Ó¼h [ j
         enemies.push_back({ scaled, pos });
         EnemyInMap::allPos.insert(pos);
     }
@@ -135,7 +188,7 @@ void Manager::spawnMerchants(int count, const std::string& merchantDataPath) {
         auto pos = std::make_pair(x, y);
         if (grid[y][x] != FLOOR || EnemyInMap::allPos.count(pos) || pos == playerPos || MerchantInMap::allPos.count(pos))
             continue;
-        // ¤TºØÃþ«¬ªº°Ó¤H
+        //  T         Ó¤H
         MerchantType type = static_cast<MerchantType>(randInt(0, 2));
         Merchant m(type, player.getlv());
         LoadMerchantData(m, merchantDataPath);
@@ -148,14 +201,24 @@ void Manager::spawnMerchants(int count, const std::string& merchantDataPath) {
 void Manager::battleIfNeeded() {
     for (auto& e : enemies) {
         if (!e.enemy.Died() && e.pos == playerPos) {
-            bool win = Battle(player, e.enemy);
+            if (addjust)
+            {
+                e.enemy.CritizeByPlayerLv(player.getlv());
+            }
+            bool win;
+            if (g_useSFMLBattle) {
+                extern sf::RenderWindow* g_sfmlWindow;
+                win = BattleSFML(*g_sfmlWindow, player, e.enemy);
+            } else {
+                win = Battle(player, e.enemy);
+            }
             if (win) {
                 EnemyInMap::allPos.erase(e.pos);
                 player.earnedexp(e.enemy.Giveexp());
                 auto items = e.enemy.getFallBackpack();
                 for(auto & item : items) {
                     player.getMaterial(item);
-				}
+                }
             }
             else {
                 gameOver = true;
@@ -168,7 +231,11 @@ void Manager::battleIfNeeded() {
 void Manager::interactIfMerchant() {
     for (auto& m : merchants) {
         if (m.pos == playerPos) {
-            m.merchant.Interact(player);
+            if (g_useSFMLBattle) {
+                MerchantInteractSFML(m.merchant, player);
+            } else {
+                m.merchant.Interact(player);
+            }
             break;
         }
     }
@@ -183,7 +250,7 @@ void Manager::moveMainCharacter(int dir) {
         grid[ny][nx] != WALL) {
         playerPos = { nx, ny };
         battleIfNeeded();
-        // §ó·s±´¯Á½d³ò 3x3
+        //   s     d   3x3
         for (int dy = -1; dy <= 1; ++dy) {
             for (int dx = -1; dx <= 1; ++dx) {
                 int x = nx + dx, y = ny + dy;
@@ -201,44 +268,44 @@ void Manager::moveMainCharacter(int dir) {
 void Manager::operateSkill()
 {
 	std::system("cls");
-    std::cout << "¤w¸Ë³Æ§Þ¯à" << std::endl;
+    std::cout << " w Ë³Æ§Þ¯ " << std::endl;
     for (auto &it : player.allskillsDesc()) {
 		std::cout << it.first << " : " << it.second << std::endl;
     }
-    std::cout << "¤w¾Ç·|§Þ¯à" << std::endl;
+    std::cout << " w Ç·| Þ¯ " << std::endl;
     for (auto &it : player.allLearnskillsDesc()) {
 		std::cout << it.first << " : " << it.second << std::endl;
     }
     while (true) {
-        std::cout << "¬O§_»Ý­n¸Ë³Æ©Î´À´«§Þ¯à?" << std::endl;
-		std::cout << "1.¸Ë³Æ§Þ¯à 2.´À´«§Þ¯à 3.ªð¦^" << std::endl;
+        std::cout << " O _ Ý­n Ë³Æ©Î´    Þ¯ ?" << std::endl;
+		std::cout << "1. Ë³Æ§Þ¯  2.     Þ¯  3.  ^" << std::endl;
 		std::string choice;
         std::cin >> choice;
         if (choice == "1") {
-            std::cout << "½Ð¿é¤J§Þ¯à½s¸¹:" << std::endl;
+            std::cout << " Ð¿ J Þ¯ s  :" << std::endl;
             std::string skillName;
             std::cin >> skillName;
 			int skillIndex = stoi(skillName);
             if (player.setbattleskill(skillIndex)) {
-                std::cout << "§Þ¯à¸Ë³Æ¦¨¥\!" << std::endl;
+                std::cout << " Þ¯ Ë³Æ¦  \!" << std::endl;
             }
             else {
-                std::cout << "§Þ¯à¸Ë³Æ¥¢±Ñ¡A½ÐÀË¬d§Þ¯à½s¸¹©Î¬O§_¤w¸g¸Ë³Æ¡C" << std::endl;
+                std::cout << " Þ¯ Ë³Æ¥  Ñ¡A   Ë¬d Þ¯ s   Î¬O _ w g Ë³Æ¡C" << std::endl;
             }
         }
         else if (choice == "2") {
-            std::cout << "½Ð¿é¤J­n´À´«ªº§Þ¯à½s¸¹:" << std::endl;
+            std::cout << " Ð¿ J n       Þ¯ s  :" << std::endl;
             std::string oldSkillName, newSkillName;
             std::cin >> oldSkillName;
-            std::cout << "½Ð¿é¤J·sªº§Þ¯à½s¸¹:" << std::endl;
+            std::cout << " Ð¿ J s   Þ¯ s  :" << std::endl;
             std::cin >> newSkillName;
 			int oldSkillIndex = stoi(oldSkillName);
 			int newSkillIndex = stoi(newSkillName);
             if (player.changebattleskill(oldSkillIndex,newSkillIndex)) {
-                std::cout << "§Þ¯à´À´«¦¨¥\!" << std::endl;
+                std::cout << " Þ¯       \!" << std::endl;
             }
             else {
-                std::cout << "§Þ¯à´À´«¥¢±Ñ¡A½ÐÀË¬d§Þ¯à½s¸¹¡C" << std::endl;
+                std::cout << " Þ¯       Ñ¡A   Ë¬d Þ¯ s   C" << std::endl;
             }
         }
         else if (choice == "3") {
@@ -250,44 +317,44 @@ void Manager::operateSkill()
 void Manager::operateEquip()
 {
     system("cls");
-    std::cout << "¤w¸Ë³Æª««~" << std::endl;
+    std::cout << " w Ë³Æª  ~" << std::endl;
     for (const auto& eq : player.allEquipsDesc()) {
         std::cout << eq.first << " : " << eq.second << std::endl;
     }
     while (true) {
-        std::cout << "¬O§_»Ý­n¸Ë³Æ©Î´À´«ª««~?" << std::endl;
-        std::cout << "1.¸Ë³Æª««~ 2.´À´«ª««~ 3.ªð¦^" << std::endl;
+        std::cout << " O _ Ý­n Ë³Æ©Î´      ~?" << std::endl;
+        std::cout << "1. Ë³Æª  ~ 2.       ~ 3.  ^" << std::endl;
         std::string choice;
         std::cin >> choice;
         if (choice == "1") {
             if (!player.canEquip()) {
-                std::cout << "µLªk¸Ë³Æ§ó¦hª««~¡A½Ð¥ý´À´«©Î¨ø¤Uª««~¡C" << std::endl;
+                std::cout << " L k Ë³Æ§ h   ~ A Ð¥      Î¨  U   ~ C" << std::endl;
 	            continue;
             }
-            std::cout << "½Ð¿é¤Jª««~½s¸¹:" << std::endl;
+            std::cout << " Ð¿ J   ~ s  :" << std::endl;
             std::string itemName;
             std::cin >> itemName;
             int itemIndex = stoi(itemName);
             if(itemIndex<0|| itemIndex >= player.getEquipSize()) {
-                std::cout << "µL®Äªºª««~½s¸¹¡A½Ð­«·s¿é¤J¡C" << std::endl;
+                std::cout << " L Äª    ~ s   A Ð­  s  J C" << std::endl;
                 continue;
 			}
 			player.wearEquip(itemIndex);
         }
         else if (choice == "2") {
-            std::cout << "½Ð¿é¤J­n´À´«ªºª««~½s¸¹:" << std::endl;
+            std::cout << " Ð¿ J n         ~ s  :" << std::endl;
             std::string oldItemName, newItemName;
             std::cin >> oldItemName;
-            std::cout << "½Ð¿é¤J·sªºª««~½s¸¹:" << std::endl;
+            std::cout << " Ð¿ J s     ~ s  :" << std::endl;
             std::cin >> newItemName;
             int oldItemIndex = stoi(oldItemName);
             if (oldItemIndex < 0 || oldItemIndex >= player.getEquipSize()) {
-                std::cout << "µL®Äªºª««~½s¸¹¡A½Ð­«·s¿é¤J¡C" << std::endl;
+                std::cout << " L Äª    ~ s   A Ð­  s  J C" << std::endl;
                 continue;
             }
             int newItemIndex = stoi(newItemName);
             if(oldItemIndex == newItemIndex || newItemIndex < 0 || newItemIndex >= player.getEquipSize()) {
-                std::cout << "µL®Äªºª««~½s¸¹¡A½Ð­«·s¿é¤J¡C" << std::endl;
+                std::cout << " L Äª    ~ s   A Ð­  s  J C" << std::endl;
                 continue;
 			}
             player.throwEquip(oldItemIndex);
@@ -322,26 +389,23 @@ void Manager::putTextureBox(int numbers)
 void Manager::IsOpenTreasureBox() {
     for (auto it = treasureBoxes.begin(); it != treasureBoxes.end(); ++it) {
         if (it->pos == playerPos) {
-            
             for (auto& mat : it->treasureBox.ecMaterial)
                 player.getMaterial(mat);
             for (auto& eq : it->treasureBox.ecEquip)
                 player.getEquip(eq);
             for (auto& mi : it->treasureBox.ecMiseryItem)
                 player.getMyseryItem(mi);
-
-            
-            std::cout << "[Debug] ª±®a·í«e¸Ë³Æ¼Æ¶q: "
-                << player.getEquipSize() << "\n";
-            system("pause");
-
-            
-            showTreasureBox(*it);
-
-            
-            treasureBoxes.erase(it);
+            if (g_useSFMLBattle) {
+                extern sf::RenderWindow* g_sfmlWindow;
+                extern sf::Font* g_sfmlFont;
+                if (g_sfmlWindow && g_sfmlFont && g_sfmlWindow->isOpen())
+                    showTreasureBoxSFML(it->treasureBox, *g_sfmlWindow, *g_sfmlFont);
+            } else {
+                showTreasureBox(*it);
+            }
             TreasureBoxInMap::allPos.erase(playerPos);
-            break;
+            treasureBoxes.erase(it);
+            return;
         }
     }
 }
@@ -409,5 +473,10 @@ void Manager::printMap() const {
 
 Player& Manager::getPlayer() { return player; }
 const Player& Manager::getPlayer() const { return player; }
+
+void Manager::Shouldadjust()
+{
+    addjust= true;
+}
 
 

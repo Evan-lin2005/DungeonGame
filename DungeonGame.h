@@ -14,6 +14,7 @@ class DungeonGame {
 public:
     DungeonGame(int width, int height, int maxFloor = 3);
     void run();
+    void runSFML();
 
 private:
     void initData();
@@ -25,7 +26,7 @@ private:
 
     Player hero_;
     std::vector<Enemy> pool_;
-    Enemy boss_;
+    std::vector<Enemy> boss_;
 
     Manager mgr_;
 

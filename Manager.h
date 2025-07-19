@@ -48,11 +48,20 @@ public:
     void printMap() const;
     Player& getPlayer();
     const Player& getPlayer() const;
+    void Shouldadjust();
+
+    // Getter for SFML visualization
+    const std::vector<EnemyInMap>& getEnemies() const { return enemies; }
+    const std::vector<MerchantInMap>& getMerchants() const { return merchants; }
+    const std::vector<TreasureBoxInMap>& getTreasureBoxes() const { return treasureBoxes; }
+    std::pair<int, int> getPlayerPos() const { return playerPos; }
+    const MapGenerator& getMapGenerator() const { return maps; }
 
 private:
     void battleIfNeeded();
     void interactIfMerchant();
     std::pair<int, int> pickRandomFloor() const;
+    bool addjust;
 
     MapGenerator maps;
     std::vector<EnemyInMap> enemies;
