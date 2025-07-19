@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <map>
+#include "GameAskSFML.h"
 struct Skill {
     std::string Name, Desc;
     float Power;

@@ -39,6 +39,15 @@
     <ClCompile Include="treasurebox.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
+    <ClCompile Include="SfmlViewer.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="GameAskSFML.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="MerchantSFML.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Character.h">
@@ -72,6 +81,15 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="GameAsk.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="SfmlViewer.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="GameAskSFML.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="MerchantSFML.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

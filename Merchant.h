@@ -3,48 +3,65 @@
 #include "Character.h"
 
 enum class MerchantType {
-	Material,///§÷®Æ°Ó¤H
-	Equipment,//ªZ¾¹°Ó¤H
-	Misery,//©_²§ÃÄ¤ô°Ó¤H
+	Material,///ææ–™å•†äºº
+	Equipment,//æ­¦å™¨å•†äºº
+	Misery,//å¥‡ç•°è—¥æ°´å•†äºº
 };
 
 struct SellMaterial
 {
 	Material material;
-	Money price;//»ù®æ
-	SellMaterial(Material m, Money p) : material(m), price(p) {};//ºc³y¨ç¼Æ
+	Money price;//åƒ¹æ ¼
+	SellMaterial(Material m, Money p) : material(m), price(p) {};//æ§‹é€ å‡½æ•¸
 };
 
 struct SellEquip
 {
 	Equip equip;
-	Money price;//»ù®æ
-	std::vector<Material> NeedMaterial;//»s§@¸Ë³Æ©Ò»İ§÷®Æ(¦³¨Ç»İ­n¦Û³Æ§÷®Æ)
-	SellEquip(Equip e, Money p, std::vector<Material> m) : equip(e), price(p), NeedMaterial(m) {};//ºc³y¨ç¼Æ
+	Money price;//åƒ¹æ ¼
+	std::vector<Material> NeedMaterial;//è£½ä½œè£å‚™æ‰€éœ€ææ–™(æœ‰äº›éœ€è¦è‡ªå‚™ææ–™)
+	SellEquip(Equip e, Money p, std::vector<Material> m) : equip(e), price(p), NeedMaterial(m) {};//æ§‹é€ å‡½æ•¸
 };
 
 struct SellMisery
 {
 	MiseryItem misery;
-	Money price;//»ù®æ
-	SellMisery(MiseryItem m, Money p) : misery(m), price(p) {};//ºc³y¨ç¼Æ
+	Money price;//åƒ¹æ ¼
+	SellMisery(MiseryItem m, Money p) : misery(m), price(p) {};//æ§‹é€ å‡½æ•¸
 };
 
+class MerchantUI {
+public:
+    virtual ~MerchantUI() = default;
+    virtual void showTitle(const std::string& title) = 0;
+    virtual void showGoods(const std::vector<std::string>& names, const std::vector<std::string>& descs, const std::vector<std::string>& prices) = 0;
+    virtual void showMoney(const Money& money) = 0;
+    virtual int selectGoods(int maxIdx) = 0;
+    virtual std::string selectAction(const std::vector<std::string>& actions) = 0;
+    virtual void showTip(const std::string& msg) = 0;
+    virtual void wait() = 0;
+};
 
 class Merchant
 {
 public:
-	void Interact(Player &p);//»P°Ó¤H¤¬°Ê
-	void showGoods();//Åã¥Ü°Ó¤H³c½æªºª««~
-	Merchant(MerchantType mtype, int level);
-	void getMaterialList(const SellMaterial& m);//ÀH¾÷¥Í¦¨°Ó¤H³c½æªºª««~
-	void getEquipmentList(const SellEquip& e);//ÀH¾÷¥Í¦¨°Ó¤H³c½æªº¸Ë³Æ
-	void getMiseryList(const SellMisery& m);//ÀH¾÷¥Í¦¨°Ó¤H³c½æªº©_²§ÃÄ¤ô
+    void Interact(Player &p, MerchantUI& ui);//èˆ‡å•†äººäº’å‹•ï¼ˆé‡æ§‹ï¼Œæ”¯æ´å¤šç¨®UIï¼‰
+    void Interact(Player &p);//èˆŠç‰ˆconsoleå°ˆç”¨ï¼Œå°‡ä¾†å¯ç§»é™¤
+    void showGoods();//é¡¯ç¤ºå•†äººè²©è³£çš„ç‰©å“
+    Merchant(MerchantType mtype, int level);
+    void getMaterialList(const SellMaterial& m);//éš¨æ©Ÿç”Ÿæˆå•†äººè²©è³£çš„ç‰©å“
+    void getEquipmentList(const SellEquip& e);//éš¨æ©Ÿç”Ÿæˆå•†äººè²©è³£çš„è£å‚™
+    void getMiseryList(const SellMisery& m);//éš¨æ©Ÿç”Ÿæˆå•†äººè²©è³£çš„å¥‡ç•°è—¥æ°´
+    // æ–°å¢getterä¾›SFML UIä½¿ç”¨
+    MerchantType getType() const { return type; }
+    std::vector<SellMaterial>& getMaterialListRef() { return MaterialList; }
+    std::vector<SellEquip>& getEquipmentListRef() { return EquipmentList; }
+    std::vector<SellMisery>& getMiseryListRef() { return MiseryList; }
 private:
-	MerchantType type;
-	int level;//°Ó¤Hµ¥¯Å(¶V°ª¨ä³c½æª««~¶Vµ}¦³)
-	std::vector<SellMaterial> MaterialList;//³c½æ°Ó«~ªí
-	std::vector<SellEquip> EquipmentList;//³c½æ¸Ë³Æªí
-	std::vector<SellMisery> MiseryList;//³c½æ©_²§ÃÄ¤ôªí
+    MerchantType type;
+    int level;//å•†äººç­‰ç´š(è¶Šé«˜å…¶è²©è³£ç‰©å“è¶Šç¨€æœ‰)
+    std::vector<SellMaterial> MaterialList;//è²©è³£å•†å“è¡¨
+    std::vector<SellEquip> EquipmentList;//è²©è³£è£å‚™è¡¨
+    std::vector<SellMisery> MiseryList;//è²©è³£å¥‡ç•°è—¥æ°´è¡¨
 };
 

@@ -1,4 +1,4 @@
-﻿#include "Character.h"
+#include "Character.h"
 
 // Player
 Player::Player(const std::string& name)
@@ -81,7 +81,7 @@ SkillResult Player::useSkill(int idx) {
     // 處理有持續效果的技能
     if (s.affectRound > 0) {
         // 建立效果物件，並由 result 的指標持有
-        result.effect = std::make_unique<Effect>(s.Desc + "效果", 0, 0, 0, 0, 0,s.affectRound);
+        result.effect = std::make_unique<Effect>(s.Desc + u8"效果", 0, 0, 0, 0, 0,s.affectRound);
 
         // 根據技能類型，決定效果內容與目標
         switch (s.Type) {
@@ -251,7 +251,10 @@ bool Player::canEquip() const
     return Equips.size() <= MaxEquipCapacity;
 }
 
-
+// Player::getEquips
+const std::vector<Equip>& Player::getEquips() const {
+    return Equips;
+}
 
 
 std::string Player::getname() const { return name; }
@@ -361,14 +364,14 @@ void Player::getMyseryItem(const MiseryItem& item)
 	}
 }
 
-void Player::throwMyseryItem(const MiseryItem& item)
-{
+void Player::throwMyseryItem(const MiseryItem& item) {
     auto it = MyseryBackpack.find(item.getName());
     if (it != MyseryBackpack.end()) {
-        // 不會產生新的 default‐constructed MiseryItem
-        it->second.amount--;
-        if (it->second.amount <= 0)
+        if (it->second.amount > 1) {
+            it->second.amount--;
+        } else {
             MyseryBackpack.erase(it);
+        }
     }
 }
 
@@ -694,7 +697,7 @@ SkillResult Enemy::Attack(Player& player) {
 
     // 6. 持續效果 (含 Debuff 6~9)
     if (chosen->affectRound > 0) {
-        result.effect =  std::make_unique<Effect>(chosen->Desc + " 效果",
+        result.effect =  std::make_unique<Effect>(chosen->Desc + u8"效果",
             0, 0, 0, 0,0,
             chosen->affectRound);
         if (chosen->Type >= 6 ) {
@@ -799,13 +802,15 @@ void Enemy::Affected() {
 
 bool Enemy::Died() const { return HP <= 0; }
 int Enemy::Giveexp() const { return expGain; }
+int Enemy::getMaxhp() const{return MaxHp;}
+int Enemy::getMaxmp() const{return MaxMp;}
 int Enemy::gethp() const { return HP; }
 int Enemy::getmp() const { return mp; }
 int Enemy::getatk() const { return Atk; }
 int Enemy::getdef() const { return Def; }
 int Enemy::getrank() const { return rank; }
 float Enemy::getMissRate()const { return MissRate; }
-std::string Enemy::getSkillName() const { return Skillidx == -1 ? "攻擊" : Skills[Skillidx].Name; }
+std::string Enemy::getSkillName() const { return Skillidx == -1 ? u8"攻擊" : Skills[Skillidx].Name; }
 std::string Enemy::getRace() const
 {return Race;}
 

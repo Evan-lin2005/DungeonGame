@@ -8,9 +8,9 @@ constexpr int ExpPerLevel = 100;
 
 
 enum class Target {
-    NONE,  // µL¥Ø¼Ğ
-    SELF,  // ¹ï¦Û¤v¬I©ñ
-    ENEMY  // ¹ï¼Ä¤H¬I©ñ
+    NONE,  
+    SELF,  
+    ENEMY  
 };
 
 #include <memory>
@@ -50,17 +50,17 @@ public:
     Player(const Player& P);
     ~Player();
 
-	//Item¬ÛÃö
+	//Item
     void wearEquip(int idx);
     void throwEquip(int idx);
     void getEquip(const Equip& e);
-    void earnmoney(int type, int amount);//ÁÈ¿ú
-	void earnmoney(const Money& amount);//ÁÈ¿ú
-    void spendmoney(Money &amount);//ªá¿ú
-	bool HaveEnoughMoney(const Money &m) const;//¬O§_¦³¨¬°÷ªº¿ú
+    void earnmoney(int type, int amount);
+	void earnmoney(const Money& amount);
+    void spendmoney(Money &amount);
+	bool HaveEnoughMoney(const Money &m) const;
     void getMaterial(const Material& item);
 	void throwMaterial(const Material& item);
-	bool HaveEnoughMaterial(const std::vector<Material>& item) const;//¬O§_¦³¨¬°÷ªº§÷®Æ
+	bool HaveEnoughMaterial(const std::vector<Material>& item) const;
 	void getMyseryItem(const MiseryItem& item);
 	void throwMyseryItem(const MiseryItem& item);
 
@@ -102,6 +102,8 @@ public:
     bool goToNextLevel()const;
 
     float getMissRate()const;
+    // æ–°å¢ï¼šå–å¾—è£å‚™åˆ—è¡¨ï¼ˆåªè®€ï¼‰
+    const std::vector<Equip>& getEquips() const;
 private:
     void Levelup();
     bool nextlevel;
@@ -110,16 +112,16 @@ private:
     int MaxMp, currMp;
     int Atk, Def;
     int exp, lv;
-	float MissRate;//°{Á×
+	float MissRate;//ï¿½{ï¿½ï¿½
 
-	Money money;//¾Ö¦³ª÷¿ú
+	Money money;//ï¿½Ö¦ï¿½ï¿½ï¿½ï¿½ï¿½
     
-    std::vector<Equip> Equips;//¸Ë³Æ
-	std::vector<Skill> Skills;//¾Ç·|ªº§Ş¯à
-	std::vector<Skill> BattleSkills;//¾Ô°«§Ş¯à
-	std::vector<Effect> Effects;//«ùÄò®ÄªG
-    std::map<std::string,Material> MaterialBackpack;//­I¥]ª««~(§÷®Æ)
-	std::map<std::string, MiseryItem> MyseryBackpack;//­I¥]ª««~(¹D¨ã)
+    std::vector<Equip> Equips;
+	std::vector<Skill> Skills;
+	std::vector<Skill> BattleSkills;
+	std::vector<Effect> Effects;
+    std::map<std::string,Material> MaterialBackpack;
+	std::map<std::string, MiseryItem> MyseryBackpack;
 };
 
 class Enemy {
@@ -138,6 +140,8 @@ public:
 
     void learnskill(const Skill& skill);
 
+	int getMaxhp() const;
+	int getMaxmp() const;
     int gethp() const;
     int getmp() const;
     int getatk() const;
@@ -147,19 +151,19 @@ public:
 	std::string getRace() const;
     std::string getSkillName() const;
 	std::vector<Material> getFallBackpack() const;
-    void upgrageByFloor(int floor);//ÀHµÛ¦a¤U«°²`¤J¦Ó¤É¯Å
+    void upgrageByFloor(int floor);
     void CritizeByPlayerLv(int lv);
 private:
-    std::string Race;//ºØ±Ú(¨M©w¾Ö¦³§Ş¯à)
+    std::string Race;
     std::string name;
     int MaxHp, HP;
     int MaxMp, mp;
     int Atk, Def;
     int expGain;
-	int Skillidx;// §Ş¯à¯Á¤Ş
-	float MissRate; // °{Á×²v
-	int rank;// ¶¥¯Å(¨M©w¥X²{¾÷²v)
-	std::vector<Material> FallBackpack; // ±¼¸¨ª««~
+	int Skillidx;
+	float MissRate;
+	int rank;
+	std::vector<Material> FallBackpack;
     std::vector<Skill> Skills;
     std::vector<Effect> Effects;
     SkillResult result;

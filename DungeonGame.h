@@ -14,6 +14,7 @@ class DungeonGame {
 public:
     DungeonGame(int width, int height, int maxFloor = 3);
     void run();
+    void runSFML();
 
 private:
     void initData();

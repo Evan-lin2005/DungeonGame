@@ -3,12 +3,12 @@
 
 void GameAsk(int& h, int& w, int& floor) {
 	using namespace std;
-	cout << "Åwªï¨Ó¨ì¦a¤U«°¨t²Î(½Ð¿ï¾ÜÃø«×) : " << std::endl;
-	cout << "1. Â²©ö(3¼h)" << std::endl;
-	cout << "2. ´¶³q(6¼h)" << std::endl;
-	cout << "3. §xÃø(9¼h)" << std::endl;
-	cout << "4. ¹ÚÆL(12¼h)" << std::endl;
-	cout << "5 µ´±æ(15¼h)" << std::endl;
+	cout << "æ­¡è¿Žä¾†åˆ°åœ°ä¸‹åŸŽç³»çµ±(è«‹é¸æ“‡é›£åº¦) : " << std::endl;
+	cout << "1. ç°¡æ˜“(3å±¤)" << std::endl;
+	cout << "2. æ™®é€š(6å±¤)" << std::endl;
+	cout << "3. å›°é›£(9å±¤)" << std::endl;
+	cout << "4. å¤¢é­˜(12å±¤)" << std::endl;
+	cout << "5 çµ•æœ›(15å±¤)" << std::endl;
 	string c;
 	while (true) {
 		
@@ -29,7 +29,7 @@ void GameAsk(int& h, int& w, int& floor) {
 			h = 40;w = 40;floor = 15;
 		}
 		else {
-			cout << "¿é¤J¿ù»~«ü¥O¡A½Ð­«·sÅçÃÒ" << endl;
+			cout << "è¼¸å…¥éŒ¯èª¤æŒ‡ä»¤ï¼Œè«‹é‡æ–°é©—è­‰" << endl;
 			continue;
 		}
 		break;

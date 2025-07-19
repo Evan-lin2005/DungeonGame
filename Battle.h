@@ -8,16 +8,16 @@ inline void clearScreen(){
 #ifdef _WIN32
     system("cls");
 #else
-    std::cout<<"\x1B[2J\x1B[H";
+    std::cout << "\x1B[2J\x1B[H";
 #endif
 }
 
 inline void printItem(const std::vector<Material>& items) {
     if (items.empty()) {
-        std::cout << "¨S¦³±¼¸¨ª««~\n";
+        std::cout << "ï¼ˆæ²’æœ‰ç²å¾—ä»»ä½•é“å…·ï¼‰\n";
         return;
     }
-    std::cout << "±¼¸¨ª««~:\n";
+    std::cout << "ç²å¾—é“å…·:\n";
     for (const auto& item : items) {
         std::cout << item.getName() << "---" << item.getDesc() << "\n";
     }
@@ -25,10 +25,10 @@ inline void printItem(const std::vector<Material>& items) {
 
 inline int choose() {
     while (true) {
-        std::cout << "½Ð¿ï¾Ü:1.´¶§ð 2.§Þ¯à 3.¹D¨ã> ";
+        std::cout << "è«‹é¸æ“‡:1.æ”»æ“Š 2.æŠ€èƒ½ 3.é“å…·> ";
         std::string idx; std::cin >> idx;
         if (idx == "1" || idx == "2"||idx == "3") return stoi(idx);
-        std::cout << "µL®Ä¾Þ§@\n";
+        std::cout << "è¼¸å…¥éŒ¯èª¤\n";
     }
 }
 
@@ -40,7 +40,7 @@ inline void printallskill(const Player& a) {
 
 inline void getallItem(Player& a, const std::vector<Material>& items) {
     if (items.empty()) return;
-    std::cout << "Àò±oª««~:\n";
+    std::cout << "ç²å¾—é“å…·:\n";
     for (const auto& item : items) {
         a.getMaterial(item);
         std::cout << item.getName() << "---" << item.getDesc() << "\n";
@@ -49,12 +49,12 @@ inline void getallItem(Player& a, const std::vector<Material>& items) {
 
 inline void playerUseItemDuringBattle(Player& a, Enemy& b) {
     if (a.getMyseryBackpack().empty()) {
-        std::cout << "§A¨S¦³¥ô¦ó¥i¥Îªº¹D¨ã¡C\n";
+        std::cout << "ä½ æ²’æœ‰å¯ä»¥ä½¿ç”¨çš„é“å…·ã€‚\n";
         system("pause");
         return;
     }
 
-    std::cout << "¥i¥Î¹D¨ã¡G\n";
+    std::cout << "å¯ç”¨é“å…·å¦‚ä¸‹:\n";
     int idx = 0;
     std::vector<std::string> items;
     for (auto& it : a.getMyseryBackpack()) {
@@ -63,11 +63,11 @@ inline void playerUseItemDuringBattle(Player& a, Enemy& b) {
         idx++;
     }
 
-    std::cout << "½Ð¿é¤J­n¨Ï¥Îªº¹D¨ã½s¸¹¡G";
+    std::cout << "è«‹è¼¸å…¥è¦ä½¿ç”¨çš„é“å…·ç·¨è™Ÿ:";
     int choice;
     std::cin >> choice;
-    if (choice < 0 || choice >= items.size()) {
-        std::cout << "¿é¤J¿ù»~¡A¨ú®ø¨Ï¥Î¡C\n";
+    if (choice < 0 || choice >= (int)items.size()) {
+        std::cout << "è¼¸å…¥éŒ¯èª¤ï¼Œç„¡æ³•ä½¿ç”¨ã€‚\n";
         system("pause");
         return;
     }
@@ -80,7 +80,7 @@ inline void playerUseItemDuringBattle(Player& a, Enemy& b) {
 
     bool reversed = (rand() % 100 < 30);
     if (reversed) {
-        std::cout << "[¹D¨ã¥¢±±!] ®ÄªG§á¦±¬°¤Ï¦V®ÄªG¡I\n";
+        std::cout << "[é“å…·åå™¬!] æ•ˆæžœå°‡åå‘\n";
         e.affectHp = -e.affectHp;
         e.affectMp = -e.affectMp;
         e.affectAtk = -e.affectAtk;
@@ -88,15 +88,15 @@ inline void playerUseItemDuringBattle(Player& a, Enemy& b) {
         e.affectMissRate = -e.affectMissRate;
     }
 
-    // ®Ú¾Ú®ÄªG¤º®e¨M©w¬I¥[¹ï¶H
+    // æ ¹æ“šæ•ˆæžœæ±ºå®šåŠ åœ¨èª°èº«ä¸Š
     bool isBuff = (e.affectHp > 0 || e.affectMp > 0 || e.affectAtk > 0 || e.affectDef > 0 || e.affectMissRate > 0);
 
     if (isBuff) {
-        std::cout << a.getname() << " Àò±o¤F " << it->second.getName() << " ªº®ÄªG¡C\n";
+        std::cout << a.getname() << " ç²å¾— " << it->second.getName() << " çš„æ•ˆæžœã€‚\n";
         a.BeEffect(e);
     }
     else {
-        std::cout << b.getname() << " ³Q¬I¥[¤F " << it->second.getName() << " ªº®ÄªG¡C\n";
+        std::cout << b.getname() << " æ‰¿å—äº† " << it->second.getName() << " çš„æ•ˆæžœã€‚\n";
         b.BeEffect(e);
     }
 
@@ -104,149 +104,37 @@ inline void playerUseItemDuringBattle(Player& a, Enemy& b) {
     system("pause");
 }
 
+// æˆ°é¬¥é¡¯ç¤º/è¼¸å…¥ä»‹é¢
+struct BattleUI {
+    virtual void showState(const Player&, const Enemy&, const std::string& info) = 0;
+    virtual int getPlayerAction(const Player&, const Enemy&) = 0; // 1=æ”»æ“Š 2=æŠ€èƒ½ 3=é“å…·
+    virtual void showResult(const std::string& result) = 0;
+    virtual void wait() = 0;
+    virtual ~BattleUI() {}
+};
 
-
-// Battle.h ¤º­×§ï«áªº Battle() ¨ç¦¡
-inline bool Battle(Player& a, Enemy& b) {
-    clearScreen();
-    std::cout << "¾D¹J¤F©Çª«!!!\n"
-        << "¼Ä¤H: " << b.getname()
-        << " HP=" << b.gethp()
-        << " MP=" << b.getmp() << "\n";
-
-    int round = 0;
-    while (true) {
-        ++round;
-        std::cout << "--- Battle Round " << round << " ---\n";
-
-        // ¦^¦X¶}©l¡Gª±®a»P¼Ä¤H¦U¦Û³B²z«ùÄò®ÄªG
-        a.Affected();
-        b.Affected();
-
-        // ==== ª±®a¦^¦X ====
-        bool usedItemThisTurn = false;
-        int choice = choose();
-
-        while (choice == 3) {
-            if (!usedItemThisTurn) {
-                playerUseItemDuringBattle(a, b);
-                usedItemThisTurn = true;
-            }
-            else {
-                std::cout << "¥»¦^¦X¤w¸g¨Ï¥Î¹L¹D¨ã¤F¡A¤£¯à¦A¥Î¡C\n";
-                system("pause");
-            }
-            choice = choose();
-        }
-
-        SkillResult playerRes;
-        if (choice == 1) {
-            playerRes.immediateDamage = a.Basicattack();
-            std::cout << a.getname() << " ¶i¦æ§ðÀ»¡I\n";
-        }
-        else if (choice == 2) {
-            printallskill(a);
-            int idx; std::cin >> idx;
-            playerRes = a.useSkill(idx);
-            std::cout << a.getname() << " ¨Ï¥Î¤F§Þ¯à "
-                << a.getBattleSkillName(idx) << "¡I\n";
-        }
-
-
-        // 1) ª±®a«ùÄò¡þÀþµo®ÄªG
-        if (playerRes.effect) {
-            // §P©w¼Ä¤H¬O§_°{Á×¦¹®ÄªG
-            if (rand() % 100 < b.getMissRate()) {
-                std::cout << b.getname() << " °{Á×¤F®ÄªG "
-                    << playerRes.effect->Desc << "¡I\n";
-            }
-            else {
-                if (playerRes.target == Target::SELF) {
-                    a.BeEffect(*playerRes.effect);
-                    std::cout << a.getname() << " Àò±o¤F "
-                        << playerRes.effect->Desc << "¡I\n";
-                }
-                else {
-                    b.BeEffect(*playerRes.effect);
-                    std::cout << b.getname() << " ³Q¬I¥[¤F "
-                        << playerRes.effect->Desc << "¡I\n";
-                }
-            }
-        }
-
-        // 2) ³B²zª±®a¥ß§Y¶Ë®`
-        if (playerRes.immediateDamage > 0) {
-            if (rand() % 100 < b.getMissRate()) {
-                std::cout << b.getname() << " °{Á×¤F§Aªº§ðÀ»¡I\n";
-            }
-            else {
-                int dmg = b.BeAttacked(playerRes.immediateDamage);
-                std::cout << a.getname() << " ¹ï " << b.getname()
-                    << " ³y¦¨¤F " << dmg << " ÂI¶Ë®`¡I\n";
-            }
-        }
-
-        // Åã¥Ü¼Ä¤Hª¬ºA
-        std::cout << b.getname() << " HP=" << b.gethp()
-            << " MP=" << b.getmp() << "\n";
-
-        // ÀË¬d¼Ä¤H¬O§_¦º¤`
-        if (b.Died()) {
-            a.earnedexp(b.Giveexp());
-            getallItem(a, b.getFallBackpack());
-            printItem(b.getFallBackpack());
-            if (a.goToNextLevel())
-                std::cout << a.getname() << " ¤É¯Å !!!\n";
-            std::cout << "Victory!\n";
-			system("pause");
-            return true;
-        }
-        std::cout << "\n";
-
-        // ==== ¼Ä¤H¦^¦X ====
-        SkillResult enemyRes = b.Attack(a);  // ¼Ä¤H¨M©w¦æ°Ê
-        std::cout<<b.getname()<<"¨Ï¥Î" << b.getSkillName() << " ¹ï " << a.getname()
-			<< " µo°Ê¤F§ðÀ»¡I\n";
-        // 1) ³B²z¼Ä¤H«ùÄò¡þÀþµo®ÄªG
-        if (enemyRes.effect) {
-            if (rand() % 100 < a.getMissRate()) {
-                std::cout << a.getname() << " °{Á×¤F®ÄªG "
-                    << enemyRes.effect->Desc << "¡I\n";
-            }
-            else {
-                if (enemyRes.target == Target::SELF) {
-                    b.BeEffect(*enemyRes.effect);
-                    std::cout << b.getname() << " Àò±o¤F "
-                        << enemyRes.effect->Desc << "¡I\n";
-                }
-                else {
-                    a.BeEffect(*enemyRes.effect);
-                    std::cout << a.getname() << " ³Q¬I¥[¤F "
-                        << enemyRes.effect->Desc << "¡I\n";
-                }
-            }
-        }
-
-        // 2) ³B²z¼Ä¤H¥ß§Y¶Ë®`
-        if (enemyRes.immediateDamage > 0) {
-            if (rand() % 100 < a.getMissRate()) {
-                std::cout << a.getname() << " °{Á×¤F¼Ä¤Hªº§ðÀ»¡I\n";
-            }
-            else {
-                int dmg = a.Beattacked(enemyRes.immediateDamage);
-                std::cout << b.getname() << " ¹ï " << a.getname()
-                    << " ³y¦¨¤F " << dmg << " ÂI¶Ë®`¡I\n";
-            }
-        }
-
-        // Åã¥Üª±®aª¬ºA
-        std::cout << a.getname() << " HP=" << a.gethp()
-            << " MP=" << a.getmp() << "\n";
-        if (a.Died()) {
-            std::cout << "Defeated...\n";
-            return false;
-        }
-        std::cout << "\n";
+// Console ç‰ˆ BattleUI
+struct ConsoleBattleUI : public BattleUI {
+    void showState(const Player& a, const Enemy& b, const std::string& info) override {
+        clearScreen();
+        std::cout << info << std::endl;
+        std::cout << "çŽ©å®¶: " << a.getname() << " HP=" << a.gethp() << "/" << a.getMaxHp() << " MP=" << a.getmp() << "/" << a.getMaxMp() << std::endl;
+        std::cout << "æ•µäºº: " << b.getname() << " HP=" << b.gethp()<< " MP=" << b.getmp() << std::endl;
     }
+    int getPlayerAction(const Player& a, const Enemy& b) override {
+        return choose();
+    }
+    void showResult(const std::string& result) override {
+        std::cout << result << std::endl;
+    }
+    void wait() override { system("pause"); }
+};
+
+// æ–°ç‰ˆ Battleï¼šå¯æ’æ‹” UI
+bool Battle(Player& a, Enemy& b, BattleUI* ui);
+// ä¿ç•™åŽŸæœ¬ console äº’å‹•çš„ Battle
+inline bool Battle(Player& a, Enemy& b) {
+    ConsoleBattleUI ui;
+    return Battle(a, b, &ui);
 }
 

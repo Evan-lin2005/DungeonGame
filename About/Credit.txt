@@ -1,0 +1,19 @@
+=== CREDITS ===
+
+Sprite & Asset Attribution:
+
+1. Dragon Asset Pack [16×16]
+   • 作者：DeepDiveGameStudio  
+   • 來源：itch.io – deepdivegamestudio.itch.io/dragon-asset-pack  
+   • 授權：可商用與修改，但不得以原始／修改後形式再販售或轉載。雖不強制歸屬，但作者「欣賞標註」 :contentReference[oaicite:1]{index=1}  
+   • 建議顯示方式：  
+     Dragon Asset Pack [16×16] – sprites by DeepDiveGameStudio (https://deepdivegamestudio.itch.io/dragon-asset-pack)
+
+2. 2D Pixel Dungeon Asset Pack
+   • 作者：Pixel_Poem  
+   • 來源：itch.io – pixel-poem.itch.io/dungeon-assetpuck  
+   • 授權：可商用與修改，但不得再販售或轉載。歸屬非必要，但「感謝標註」 :contentReference[oaicite:2]{index=2}  
+   • 建議顯示方式：  
+     2D Pixel Dungeon Asset Pack – assets by Pixel_Poem (https://pixel-poem.itch.io/dungeon-assetpuck)
+
+=== END OF CREDITS ===
