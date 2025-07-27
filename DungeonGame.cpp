@@ -306,8 +306,20 @@ void DungeonGame::runSFML() {
                         }
                         mgr.getPlayer().wearEquip(hover);
                         window.clear(sf::Color(30,30,30));
-                        std::string msg = u8"裝備成功！";
-                        sf::Text msgT(sf::String::fromUtf8(msg.begin(), msg.end()), font, 24); msgT.setFillColor(sf::Color::White); msgT.setPosition(100, 200); window.draw(msgT);
+                        std::string msg;
+                        if (mgr.getPlayer().getEquips()[hover].used) {
+                            mgr.getPlayer().unequip(hover);
+                            msg = u8"卸下成功！";
+                        } else if (mgr.getPlayer().getEquippedCount() < MaxWearEquips) {
+                            mgr.getPlayer().wearEquip(hover);
+                            msg = u8"裝備成功！";
+                        } else {
+                            msg = u8"裝備已達上限！";
+                        }
+                        sf::Text msgT(sf::String::fromUtf8(msg.begin(), msg.end()), font, 24);
+                        msgT.setFillColor(sf::Color::White);
+                        msgT.setPosition(100, 200);
+                        window.draw(msgT);
                         window.display();
                         sf::sleep(sf::seconds(1));
                     }

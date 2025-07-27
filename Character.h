@@ -4,6 +4,7 @@
 
 constexpr int MaxBattleSkill = 6;
 constexpr int ExpPerLevel = 100;
+constexpr int MaxWearEquips = 6; // 同時可穿戴的裝備數量上限
 
 
 
@@ -95,8 +96,9 @@ public:
     int getlv() const;
     int getexp()const;
     int getMaxHp()const;
-	int getMaxMp()const;
-	int getEquipSize() const;
+       int getMaxMp()const;
+       int getEquipSize() const;
+    int getEquippedCount() const;
     std::string getSkillName(int idx) const;
 	std::string getBattleSkillName(int idx) const;
     const std::map<std::string, MiseryItem>& getMyseryBackpack()const;

@@ -43,11 +43,16 @@ void Player::wearEquip(int idx) {
     if (idx < 0 || idx >= Equips.size()) return;
     auto& it = Equips[idx];
     if (!it.used) {
+        int equipped = 0;
+        for (const auto& eq : Equips) if (eq.used) ++equipped;
+        if (equipped >= MaxWearEquips) return; // 已達上限
         MaxHp += it.affectHp;
         Atk += it.affectAtk;
         Def += it.affectDef;
         MaxMp += it.affectMp;
-                it.used = true;// 標記為已裝備
+
+        it.used = true;// 標記為已裝備
+
     }
 }
 
@@ -290,6 +295,13 @@ int Player::getMaxMp() const
 int Player::getEquipSize() const
 {
     return Equips.size();
+}
+
+int Player::getEquippedCount() const
+{
+    int count = 0;
+    for (const auto& e : Equips) if (e.used) ++count;
+    return count;
 }
 
 std::string Player::getSkillName(int idx) const
