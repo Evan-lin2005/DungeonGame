@@ -5,6 +5,7 @@
 #include "Battle.h"
 #include <algorithm>
 #include <map>
+#include "MapGenerator.h"
 #include "Manager.h"
 extern Manager* g_mgr_ptr;
 SFMLMANAGER sfmlMgr;
@@ -100,7 +101,7 @@ void SfmlBattleUI::showState(const Player& a, const Enemy& b, const std::string&
     sf::Text eName(sf::String::fromUtf8(ename.begin(), ename.end()), g_battleFont, 18);
     eName.setPosition(320, 100);
     g_battleWindow->draw(eName);
-    sf::Text infoText(info, g_battleFont, 20);
+    sf::Text infoText(sf::String::fromUtf8(info.begin(), info.end()), g_battleFont, 20);
     infoText.setPosition(120, 60);
     g_battleWindow->draw(infoText);
     // 血量數字
@@ -119,8 +120,22 @@ void SfmlBattleUI::showState(const Player& a, const Enemy& b, const std::string&
     eMp.setFillColor(sf::Color(80,80,255));
     eMp.setPosition(320, 155);
     g_battleWindow->draw(eMp);
+    int py = 240;
+    for (const auto& d : a.listEffectsDesc()) {
+        sf::Text t(sf::String::fromUtf8(d.begin(), d.end()), g_battleFont, 14);
+        t.setPosition(60, py);
+        g_battleWindow->draw(t);
+        py += 20;
+    }
+    int ey = 240;
+    for (const auto& d : b.listEffectsDesc()) {
+        sf::Text t(sf::String::fromUtf8(d.begin(), d.end()), g_battleFont, 14);
+        t.setPosition(300, ey);
+        g_battleWindow->draw(t);
+        ey += 20;
+    }
     // 操作提示
-    sf::Text op1(u8"1.攻擊  2.技能  3.道具", g_battleFont, 18);
+    sf::Text op1(sf::String::fromUtf8(u8"1.攻擊  2.技能  3.道具", u8"1.攻擊  2.技能  3.道具" + strlen(u8"1.攻擊  2.技能  3.道具")), g_battleFont, 18);
     op1.setPosition(120, 320);
     g_battleWindow->draw(op1);
     // --- 繪製浮動傷害數字 ---
@@ -243,7 +258,7 @@ int SfmlBattleUI::getPlayerAction(const Player& a, const Enemy& b) {
 void SfmlBattleUI::showResult(const std::string& result) {
     g_battleResult = result;
     if (!g_battleWindow) return;
-    sf::Text resText(result, g_battleFont, 28);
+    sf::Text resText(sf::String::fromUtf8(result.begin(), result.end()), g_battleFont, 28);
     resText.setPosition(180, 120);
     g_battleWindow->draw(resText);
     g_battleWindow->display();
@@ -285,7 +300,7 @@ int SfmlBattleUI::selectSkill(const Player& player) {
             g_battleWindow->draw(text);
         }
         // 提示
-        sf::Text tip(u8"請用滑鼠點選技能，或按ESC取消", g_battleFont, 18);
+        sf::Text tip(sf::String::fromUtf8(u8"請用滑鼠點選技能，或按ESC取消", u8"請用滑鼠點選技能，或按ESC取消" + strlen(u8"請用滑鼠點選技能，或按ESC取消")), g_battleFont, 18);
         tip.setFillColor(sf::Color::White);
         tip.setPosition(100, 60 + maxShow * 60 + 10);
         g_battleWindow->draw(tip);
@@ -328,7 +343,7 @@ int SfmlBattleUI::selectItem(Player& player, Enemy& enemy) {
         if (!g_battleFontLoaded) {
             std::cerr << "[錯誤] 字型載入失敗：C:/Windows/Fonts/msjh.ttc\n";
         }
-        sf::Text t(u8"你沒有可以使用的道具。", g_battleFont, 22);
+        sf::Text t(sf::String::fromUtf8(u8"你沒有可以使用的道具。", u8"你沒有可以使用的道具。" + strlen(u8"你沒有可以使用的道具。")), g_battleFont, 22);
         t.setFillColor(sf::Color::White);
         t.setPosition(100, 120);
         g_battleWindow->draw(t);
@@ -341,7 +356,7 @@ int SfmlBattleUI::selectItem(Player& player, Enemy& enemy) {
     int hover = -1;
     while (g_battleWindow && g_battleWindow->isOpen()) {
         g_battleWindow->clear(sf::Color(30,30,30));
-        sf::Text title(u8"請選擇要使用的道具：", g_battleFont, 22);
+        sf::Text title(sf::String::fromUtf8(u8"請選擇要使用的道具：", u8"請選擇要使用的道具：" + strlen(u8"請選擇要使用的道具：")), g_battleFont, 22);
         title.setFillColor(sf::Color::White);
         title.setPosition(100, 30);
         g_battleWindow->draw(title);
@@ -385,6 +400,25 @@ bool Battle(Player& a, Enemy& b, BattleUI* ui) {
     std::string info = "戰鬥開始!";
     while (true) {
         ++round;
+        a.Affected();
+        b.Affected();
+        if (b.Died()) {
+            a.earnedexp(b.Giveexp());
+            getallItem(a, b.getFallBackpack());
+            printItem(b.getFallBackpack());
+            if (a.goToNextLevel())
+                info = a.getname() + " 升級了!";
+            ui->showState(a, b, info);
+            ui->showResult("Victory!");
+            ui->wait();
+            return true;
+        }
+        if (a.Died()) {
+            ui->showState(a, b, info);
+            ui->showResult("你被打倒了!");
+            ui->wait();
+            return false;
+        }
         bool usedItemThisTurn = false;
         SkillResult playerRes; // 修正：移到這裡
         while (true) { // 玩家回合可多次操作（道具不消耗回合）
@@ -457,12 +491,29 @@ bool Battle(Player& a, Enemy& b, BattleUI* ui) {
                 continue; // 用道具後可再選其他行動，但不能再用道具
             }
         }
-        if (playerRes.immediateDamage > 0) {
-            int dmg = b.BeAttacked(playerRes.immediateDamage);
-            if (auto sfmlui = dynamic_cast<SfmlBattleUI*>(ui)) {
-                sfmlui->floatingNumbers.push_back({dmg, sf::Vector2f(340, 120), sf::Color::Red, 2.0f});
+        if (playerRes.effect) {
+            if (playerRes.target == Target::SELF) {
+                a.BeEffect(*playerRes.effect);
+                info += " " + a.getname() + " 獲得" + playerRes.effect->Desc + "!";
+            } else if (playerRes.target == Target::ENEMY) {
+                if (rand() % 100 >= int(b.getMissRate())) {
+                    b.BeEffect(*playerRes.effect);
+                    info += " " + b.getname() + " 受到" + playerRes.effect->Desc + "!";
+                } else {
+                    info += " 敵人閃避了效果";
+                }
             }
-            info += " 對敵人造成 " + std::to_string(dmg) + " 傷害!";
+        }
+        if (playerRes.immediateDamage > 0) {
+            if (rand() % 100 >= int(b.getMissRate())) {
+                int dmg = b.BeAttacked(playerRes.immediateDamage);
+                if (auto sfmlui = dynamic_cast<SfmlBattleUI*>(ui)) {
+                    sfmlui->floatingNumbers.push_back({dmg, sf::Vector2f(340, 120), sf::Color::Red, 2.0f});
+                }
+                info += " 對敵人造成 " + std::to_string(dmg) + " 傷害!";
+            } else {
+                info += " 攻擊被閃避!";
+            }
         }
         ui->showState(a, b, info);
         if (b.Died()) {
@@ -477,12 +528,29 @@ bool Battle(Player& a, Enemy& b, BattleUI* ui) {
         }
         // 敵人回合
         SkillResult enemyRes = b.Attack(a);
-        if (enemyRes.immediateDamage > 0) {
-            int dmg = a.Beattacked(enemyRes.immediateDamage);
-            if (auto sfmlui = dynamic_cast<SfmlBattleUI*>(ui)) {
-                sfmlui->floatingNumbers.push_back({dmg, sf::Vector2f(100, 120), sf::Color::Yellow, 2.0f});
+        if (enemyRes.effect) {
+            if (enemyRes.target == Target::SELF) {
+                b.BeEffect(*enemyRes.effect);
+                info = b.getname() + " 獲得" + enemyRes.effect->Desc + "!";
+            } else if (enemyRes.target == Target::ENEMY) {
+                if (rand() % 100 >= int(a.getMissRate())) {
+                    a.BeEffect(*enemyRes.effect);
+                    info = a.getname() + " 受到" + enemyRes.effect->Desc + "!";
+                } else {
+                    info = a.getname() + " 閃避了效果";
+                }
             }
-            info = b.getname() + " 攻擊造成 " + std::to_string(dmg) + " 傷害!";
+        }
+        if (enemyRes.immediateDamage > 0) {
+            if (rand() % 100 >= int(a.getMissRate())) {
+                int dmg = a.Beattacked(enemyRes.immediateDamage);
+                if (auto sfmlui = dynamic_cast<SfmlBattleUI*>(ui)) {
+                    sfmlui->floatingNumbers.push_back({dmg, sf::Vector2f(100, 120), sf::Color::Yellow, 2.0f});
+                }
+                info = b.getname() + " 攻擊造成 " + std::to_string(dmg) + " 傷害!";
+            } else {
+                info = b.getname() + " 的攻擊被閃避!";
+            }
         }
         ui->showState(a, b, info);
         if (a.Died()) {
@@ -551,57 +619,53 @@ void SFMLMANAGER::drawAll(sf::RenderWindow& window, const std::vector<std::vecto
     const std::vector<std::pair<int, int>>& merchants,
     const std::vector<std::pair<int, int>>& treasureBoxes,
     std::pair<int, int> stairsPos,
+    const std::set<std::pair<int,int>>& visible,
     int tileSize) {
     if (!loaded) return;
     int H = map.size(), W = map[0].size();
     for (int y = 0; y < H; ++y) {
         for (int x = 0; x < W; ++x) {
-            sf::Sprite* tile = nullptr;
-            if (map[y][x] == 0) tile = &wallSprite;
-            else if (map[y][x] == 1) tile = &groundSprite;
-            else if (map[y][x] == 2) tile = &stairSprite;
-            if (tile) {
-                tile->setPosition(x * tileSize, y * tileSize);
-                window.draw(*tile);
+            auto p = std::make_pair(x, y);
+            if (visible.count(p)) {
+                sf::Sprite* tile = nullptr;
+                if (map[y][x] == WALL) tile = &wallSprite;
+                else tile = &groundSprite; // 未顯示樓梯，由參數控制
+                if (tile) {
+                    tile->setPosition(x * tileSize, y * tileSize);
+                    window.draw(*tile);
+                }
+            } else {
+                sf::RectangleShape fog(sf::Vector2f((float)tileSize, (float)tileSize));
+                fog.setFillColor(sf::Color(0,0,0));
+                fog.setPosition(x * tileSize, y * tileSize);
+                window.draw(fog);
             }
         }
     }
-    // �e�_�c
-    for (auto& pos : treasureBoxes) {
-        treasureBoxSprite.setPosition(pos.first * tileSize, pos.second * tileSize);
-        window.draw(treasureBoxSprite);
+    // 樓梯
+    if (visible.count(stairsPos)) {
+        stairSprite.setPosition(stairsPos.first * tileSize, stairsPos.second * tileSize);
+        window.draw(stairSprite);
     }
-    // �e�ӤH
+    for (auto& pos : treasureBoxes) {
+        if (visible.count(pos)) {
+            treasureBoxSprite.setPosition(pos.first * tileSize, pos.second * tileSize);
+            window.draw(treasureBoxSprite);
+        }
+    }
     for (auto& pos : merchants) {
-        merchantSprite.setPosition(pos.first * tileSize, pos.second * tileSize);
-        merchantSprite.setScale((float)tileSize / 16, (float)tileSize / 16);
-        window.draw(merchantSprite);
+        if (visible.count(pos)) {
+            merchantSprite.setPosition(pos.first * tileSize, pos.second * tileSize);
+            merchantSprite.setScale((float)tileSize / 16, (float)tileSize / 16);
+            window.draw(merchantSprite);
+        }
     }
     // 畫敵人
-    if (g_mgr_ptr) {
-        const auto& enemyObjs = g_mgr_ptr->getEnemies();
-        for (size_t i = 0; i < enemies.size(); ++i) {
-            if (i < enemyObjs.size()) {
-                auto pos = enemies[i];
-                std::string race = enemyObjs[i].enemy.getRace();
-                const sf::Texture* tex = getEnemyTexture(race);
-                if (!tex) tex = &enemyTexture;
-                sf::Sprite sprite(*tex, sf::IntRect(0, 0, 24, 24));
-                sprite.setPosition(pos.first * tileSize, pos.second * tileSize);
-                sprite.setScale((float)tileSize / 24, (float)tileSize / 24);
-                window.draw(sprite);
-            } else {
-                enemySprite.setPosition(enemies[i].first * tileSize, enemies[i].second * tileSize);
-                enemySprite.setScale((float)tileSize / 24, (float)tileSize / 24);
-                window.draw(enemySprite);
-            }
-        }
-    } else {
-        for (auto& pos : enemies) {
-            enemySprite.setPosition(pos.first * tileSize, pos.second * tileSize);
-            enemySprite.setScale((float)tileSize / 24, (float)tileSize / 24);
-            window.draw(enemySprite);
-        }
+    for (auto& pos : enemies) {
+        if (!visible.count(pos)) continue;
+        enemySprite.setPosition(pos.first * tileSize, pos.second * tileSize);
+        enemySprite.setScale((float)tileSize / 24, (float)tileSize / 24);
+        window.draw(enemySprite);
     }
     //e
     playerSprite.setPosition(playerPos.first * tileSize, playerPos.second * tileSize);
