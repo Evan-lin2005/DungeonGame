@@ -106,6 +106,7 @@ void DungeonGame::runSFML() {
     auto& mgr = mgr_;
     SFMLMANAGER sfmlMgr;
     sfmlMgr.loadTextures();
+    g_mgr_ptr = &mgr;
     const auto* mapData = &mgr.getMapGenerator().getMap();
     int H = mapData->size(), W = (*mapData)[0].size();
     sf::RenderWindow window(sf::VideoMode(W * tileSize, H * tileSize),"DungeonGame(SFML)");
@@ -338,13 +339,15 @@ void DungeonGame::runSFML() {
                 mapInt[y][x] = (int)(*mapData)[y][x];
         // 整理物件座標
         std::vector<std::pair<int, int>> enemies, merchants, treasureBoxes;
-        for (const auto& e : mgr.getEnemies()) enemies.push_back(e.pos);
+        for (const auto& e : mgr.getEnemies())
+            if (!e.enemy.Died())
+                enemies.push_back(e.pos);
         for (const auto& m : mgr.getMerchants()) merchants.push_back(m.pos);
         for (const auto& t : mgr.getTreasureBoxes()) treasureBoxes.push_back(t.pos);
         auto playerPos = mgr.getPlayerPos();
         auto stairsPos = mgr.getMapGenerator().getStairs();
         window.clear();
-        sfmlMgr.drawAll(window, mapInt, playerPos, enemies, merchants, treasureBoxes, stairsPos, tileSize);
+        sfmlMgr.drawAll(window, mapInt, playerPos, enemies, merchants, treasureBoxes, stairsPos, mgr.getVisible(), tileSize);
         window.display();
         // 新增：遊戲結束判斷
         if (mgr.isGameOver()) {
