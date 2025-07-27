@@ -58,7 +58,7 @@ void showTreasureBoxSFML(const TreasureBox& box, sf::RenderWindow& window, sf::F
                 running = false;
         }
         window.clear(sf::Color(40, 30, 10));
-        sf::Text title("你打開了寶箱！", font, 28);
+        sf::Text title(sf::String::fromUtf8(u8"你打開了寶箱！", u8"你打開了寶箱！" + strlen(u8"你打開了寶箱！")), font, 28);
         title.setFillColor(sf::Color::Yellow);
         title.setPosition(60, 30);
         window.draw(title);
@@ -85,12 +85,12 @@ void showTreasureBoxSFML(const TreasureBox& box, sf::RenderWindow& window, sf::F
             window.draw(t);
         }
         if (box.ecMaterial.empty() && box.ecEquip.empty() && box.ecMiseryItem.empty()) {
-            sf::Text t("寶箱是空的...", font, 22);
+            sf::Text t(sf::String::fromUtf8(u8"寶箱是空的...", u8"寶箱是空的..." + strlen(u8"寶箱是空的...")), font, 22);
             t.setFillColor(sf::Color::Red);
             t.setPosition(60, y);
             window.draw(t);
         }
-        sf::Text ok("（點擊或按任意鍵繼續）", font, 18);
+        sf::Text ok(sf::String::fromUtf8(u8"（點擊或按任意鍵繼續）", u8"（點擊或按任意鍵繼續）" + strlen(u8"（點擊或按任意鍵繼續）")), font, 18);
         ok.setFillColor(sf::Color::White);
         ok.setPosition(60, y + 40);
         window.draw(ok);
@@ -199,26 +199,27 @@ void Manager::spawnMerchants(int count, const std::string& merchantDataPath) {
 }
 
 void Manager::battleIfNeeded() {
-    for (auto& e : enemies) {
-        if (!e.enemy.Died() && e.pos == playerPos) {
+    for (auto it = enemies.begin(); it != enemies.end(); ++it) {
+        if (!it->enemy.Died() && it->pos == playerPos) {
             if (addjust)
             {
-                e.enemy.CritizeByPlayerLv(player.getlv());
+                it->enemy.CritizeByPlayerLv(player.getlv());
             }
             bool win;
             if (g_useSFMLBattle) {
                 extern sf::RenderWindow* g_sfmlWindow;
-                win = BattleSFML(*g_sfmlWindow, player, e.enemy);
+                win = BattleSFML(*g_sfmlWindow, player, it->enemy);
             } else {
-                win = Battle(player, e.enemy);
+                win = Battle(player, it->enemy);
             }
             if (win) {
-                EnemyInMap::allPos.erase(e.pos);
-                player.earnedexp(e.enemy.Giveexp());
-                auto items = e.enemy.getFallBackpack();
-                for(auto & item : items) {
+                EnemyInMap::allPos.erase(it->pos);
+                player.earnedexp(it->enemy.Giveexp());
+                auto items = it->enemy.getFallBackpack();
+                for (auto& item : items) {
                     player.getMaterial(item);
                 }
+                enemies.erase(it);
             }
             else {
                 gameOver = true;
@@ -353,12 +354,13 @@ void Manager::operateEquip()
                 continue;
             }
             int newItemIndex = stoi(newItemName);
-            if(oldItemIndex == newItemIndex || newItemIndex < 0 || newItemIndex >= player.getEquipSize()) {
+            if (newItemIndex < 0 || newItemIndex >= player.getEquipSize() || oldItemIndex == newItemIndex) {
                 std::cout << " L Ī    ~ s   A Э  s  J C" << std::endl;
                 continue;
-			}
-            player.throwEquip(oldItemIndex);
-			player.wearEquip(newItemIndex);
+                        }
+            if (newItemIndex > oldItemIndex) newItemIndex--;
+            player.unequip(oldItemIndex);
+            player.wearEquip(newItemIndex);
         }
         else if (choice == "3") {
             return;
@@ -473,6 +475,8 @@ void Manager::printMap() const {
 
 Player& Manager::getPlayer() { return player; }
 const Player& Manager::getPlayer() const { return player; }
+
+const std::set<std::pair<int,int>>& Manager::getVisible() const { return allsearchPos; }
 
 void Manager::Shouldadjust()
 {

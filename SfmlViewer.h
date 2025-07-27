@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 using namespace sf;
 #include "Battle.h"
+#include <set>
 
 // SFML 圖像化戰鬥介面
 struct SfmlBattleUI : public BattleUI {
@@ -42,6 +43,7 @@ public:
         const std::vector<std::pair<int, int>>& merchants,
         const std::vector<std::pair<int, int>>& treasureBoxes,
         std::pair<int, int> stairsPos,
+        const std::set<std::pair<int,int>>& visible,
         int tileSize = 24);
     // 取得敵人圖檔快取指標
     const sf::Texture* getEnemyTexture(const std::string& race) const {
@@ -52,6 +54,9 @@ public:
     // 新增：取得預設敵人圖
     const sf::Texture* getDefaultEnemyTexture() const { return &enemyTexture; }
 };
+
+// 提供全域 sfmlMgr 供多個檔案共用
+extern SFMLMANAGER sfmlMgr;
 
 // 圖像化戰鬥：顯示雙方圖像、血量，玩家用鍵盤選擇攻擊，直到分出勝負
 bool BattleSFML(sf::RenderWindow& window, Player& player, Enemy& enemy);
