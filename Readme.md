@@ -8,3 +8,10 @@
 mkdir build && cd build
 cmake ..
 cmake --build .
+```
+
+建置完成後，執行以下指令啟動遊戲：
+
+```bash
+./DungeonGame
+```

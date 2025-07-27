@@ -43,11 +43,26 @@ void Player::wearEquip(int idx) {
     if (idx < 0 || idx >= Equips.size()) return;
     auto& it = Equips[idx];
     if (!it.used) {
+        int equipped = 0;
+        for (const auto& eq : Equips) if (eq.used) ++equipped;
+        if (equipped >= MaxWearEquips) return; // 已達上限
         MaxHp += it.affectHp;
         Atk += it.affectAtk;
         Def += it.affectDef;
         MaxMp += it.affectMp;
-		it.used = true;// 標記為已裝備
+        it.used = true;// 標記為已裝備
+    }
+}
+
+void Player::unequip(int idx) {
+    if (idx < 0 || idx >= Equips.size()) return;
+    auto& it = Equips[idx];
+    if (it.used) {
+        MaxHp -= it.affectHp;
+        Atk -= it.affectAtk;
+        Def -= it.affectDef;
+        MaxMp -= it.affectMp;
+        it.used = false;
     }
 }
 
@@ -280,6 +295,13 @@ int Player::getEquipSize() const
     return Equips.size();
 }
 
+int Player::getEquippedCount() const
+{
+    int count = 0;
+    for (const auto& e : Equips) if (e.used) ++count;
+    return count;
+}
+
 std::string Player::getSkillName(int idx) const
 {
     return Skills[idx].Name;
@@ -387,21 +409,24 @@ void Player::earnmoney(int type, int amount)
     }
     else if (type == 2) { // 銅幣
         money.Cooper += amount;
-	}
+    }
+    normalizeMoney();
 }
 
 void Player::earnmoney(const Money& amount)
 {
     money.Gold += amount.Gold;
     money.Sliver += amount.Sliver;
-	money.Cooper += amount.Cooper;
+    money.Cooper += amount.Cooper;
+    normalizeMoney();
 }
 
 void Player::spendmoney(Money& amount)
 {
-	money.Gold -= amount.Gold;
-	money.Sliver -= amount.Sliver;
-	money.Cooper -= amount.Cooper;
+        money.Gold -= amount.Gold;
+        money.Sliver -= amount.Sliver;
+        money.Cooper -= amount.Cooper;
+        normalizeMoney();
 }
 
 bool Player::HaveEnoughMoney(const Money &m) const
@@ -413,6 +438,18 @@ bool Player::HaveEnoughMoney(const Money &m) const
     return false;
 }
 
+void Player::normalizeMoney()
+{
+    if (money.Cooper >= 100) {
+        money.Sliver += money.Cooper / 100;
+        money.Cooper %= 100;
+    }
+    if (money.Sliver >= 100) {
+        money.Gold += money.Sliver / 100;
+        money.Sliver %= 100;
+    }
+}
+
 bool Player::goToNextLevel() const
 {
     return nextlevel;
@@ -421,6 +458,15 @@ bool Player::goToNextLevel() const
 float Player::getMissRate() const
 {
     return MissRate;
+}
+
+std::vector<std::string> Player::listEffectsDesc() const
+{
+    std::vector<std::string> desc;
+    for (const auto& e : Effects) {
+        desc.push_back(e.Desc + "(" + std::to_string(e.count) + ")");
+    }
+    return desc;
 }
 
 
@@ -813,6 +859,15 @@ float Enemy::getMissRate()const { return MissRate; }
 std::string Enemy::getSkillName() const { return Skillidx == -1 ? u8"攻擊" : Skills[Skillidx].Name; }
 std::string Enemy::getRace() const
 {return Race;}
+
+std::vector<std::string> Enemy::listEffectsDesc() const
+{
+    std::vector<std::string> desc;
+    for (const auto& e : Effects) {
+        desc.push_back(e.Desc + "(" + std::to_string(e.count) + ")");
+    }
+    return desc;
+}
 
 
 std::vector<Material> Enemy::getFallBackpack() const
