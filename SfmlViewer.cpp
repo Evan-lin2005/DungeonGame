@@ -656,6 +656,7 @@ void SFMLMANAGER::drawAll(sf::RenderWindow& window, const std::vector<std::vecto
         }
     }
     // 畫敵人
+
     for (auto& pos : enemies) {
         if (!visible.count(pos)) continue;
         enemySprite.setPosition(pos.first * tileSize, pos.second * tileSize);
