@@ -47,7 +47,19 @@ void Player::wearEquip(int idx) {
         Atk += it.affectAtk;
         Def += it.affectDef;
         MaxMp += it.affectMp;
-		it.used = true;// 標記為已裝備
+                it.used = true;// 標記為已裝備
+    }
+}
+
+void Player::unequip(int idx) {
+    if (idx < 0 || idx >= Equips.size()) return;
+    auto& it = Equips[idx];
+    if (it.used) {
+        MaxHp -= it.affectHp;
+        Atk -= it.affectAtk;
+        Def -= it.affectDef;
+        MaxMp -= it.affectMp;
+        it.used = false;
     }
 }
 

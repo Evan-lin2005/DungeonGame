@@ -299,9 +299,10 @@ void DungeonGame::runSFML() {
                     if (e2.type == sf::Event::Closed) { window.close(); leave = true; }
                     if (e2.type == sf::Event::KeyPressed && e2.key.code == sf::Keyboard::Escape) leave = true;
                     if (e2.type == sf::Event::MouseButtonPressed && e2.mouseButton.button == sf::Mouse::Left && hover >= 0) {
-                        // 換裝前先全部卸下
+                        // 換裝前先全部卸下但保留物品
                         for (int i = (int)mgr.getPlayer().getEquipSize() - 1; i >= 0; --i) {
-                            if (mgr.getPlayer().getEquips()[i].used) mgr.getPlayer().throwEquip(i);
+                            if (mgr.getPlayer().getEquips()[i].used)
+                                mgr.getPlayer().unequip(i);
                         }
                         mgr.getPlayer().wearEquip(hover);
                         window.clear(sf::Color(30,30,30));
