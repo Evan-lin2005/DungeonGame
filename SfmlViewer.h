@@ -55,5 +55,8 @@ public:
     const sf::Texture* getDefaultEnemyTexture() const { return &enemyTexture; }
 };
 
+// 提供全域 sfmlMgr 供多個檔案共用
+extern SFMLMANAGER sfmlMgr;
+
 // 圖像化戰鬥：顯示雙方圖像、血量，玩家用鍵盤選擇攻擊，直到分出勝負
 bool BattleSFML(sf::RenderWindow& window, Player& player, Enemy& enemy);

@@ -105,7 +105,6 @@ void DungeonGame::run() {
 void DungeonGame::runSFML() {
     const int tileSize = 24;
     auto& mgr = mgr_;
-    SFMLMANAGER sfmlMgr;
     sfmlMgr.loadTextures();
     g_mgr_ptr = &mgr;
     const auto* mapData = &mgr.getMapGenerator().getMap();

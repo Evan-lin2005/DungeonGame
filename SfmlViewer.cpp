@@ -5,6 +5,7 @@
 #include "Battle.h"
 #include <algorithm>
 #include <map>
+#include "MapGenerator.h"
 #include "Manager.h"
 extern Manager* g_mgr_ptr;
 SFMLMANAGER sfmlMgr;
@@ -627,9 +628,8 @@ void SFMLMANAGER::drawAll(sf::RenderWindow& window, const std::vector<std::vecto
             auto p = std::make_pair(x, y);
             if (visible.count(p)) {
                 sf::Sprite* tile = nullptr;
-                if (map[y][x] == 0) tile = &wallSprite;
-                else if (map[y][x] == 1) tile = &groundSprite;
-                else if (map[y][x] == 2) tile = &stairSprite;
+                if (map[y][x] == WALL) tile = &wallSprite;
+                else tile = &groundSprite; // 未顯示樓梯，由參數控制
                 if (tile) {
                     tile->setPosition(x * tileSize, y * tileSize);
                     window.draw(*tile);
@@ -641,6 +641,12 @@ void SFMLMANAGER::drawAll(sf::RenderWindow& window, const std::vector<std::vecto
                 window.draw(fog);
             }
         }
+    }
+
+    // 樓梯
+    if (visible.count(stairsPos)) {
+        stairSprite.setPosition(stairsPos.first * tileSize, stairsPos.second * tileSize);
+        window.draw(stairSprite);
     }
     for (auto& pos : treasureBoxes) {
         if (visible.count(pos)) {
@@ -654,6 +660,8 @@ void SFMLMANAGER::drawAll(sf::RenderWindow& window, const std::vector<std::vecto
             merchantSprite.setScale((float)tileSize / 16, (float)tileSize / 16);
             window.draw(merchantSprite);
         }
+    }
+
     for (auto& pos : enemies) {
         if (!visible.count(pos)) continue;
         enemySprite.setPosition(pos.first * tileSize, pos.second * tileSize);
