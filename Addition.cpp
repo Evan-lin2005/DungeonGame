@@ -22,7 +22,8 @@ Skill& Skill::operator=(const Skill& s)
 
 // Effect
 void Effect::nextRound() { --count; }
-bool Effect::existEffect() const { return count >= 0; }
+// 持續回合結束(降至0)後即視為失效
+bool Effect::existEffect() const { return count > 0; }
 Effect::Effect(const std::string& desc,
     int ahp, int aatk, int adef, int amp,int affectmissrate, int c)
     : Desc(desc), affectHp(ahp), affectAtk(aatk),

@@ -56,6 +56,7 @@ public:
     const std::vector<TreasureBoxInMap>& getTreasureBoxes() const { return treasureBoxes; }
     std::pair<int, int> getPlayerPos() const { return playerPos; }
     const MapGenerator& getMapGenerator() const { return maps; }
+    const std::set<std::pair<int,int>>& getVisible() const;
 
 private:
     void battleIfNeeded();
