@@ -52,6 +52,8 @@ public:
 
 	//Item
     void wearEquip(int idx);
+    // 卸下裝備但保留物品
+    void unequip(int idx);
     void throwEquip(int idx);
     void getEquip(const Equip& e);
     void earnmoney(int type, int amount);

@@ -359,8 +359,8 @@ void Manager::operateEquip()
                 continue;
                         }
             if (newItemIndex > oldItemIndex) newItemIndex--;
-            player.throwEquip(oldItemIndex);
-                        player.wearEquip(newItemIndex);
+            player.unequip(oldItemIndex);
+            player.wearEquip(newItemIndex);
         }
         else if (choice == "3") {
             return;
