@@ -423,6 +423,15 @@ float Player::getMissRate() const
     return MissRate;
 }
 
+std::vector<std::string> Player::listEffectsDesc() const
+{
+    std::vector<std::string> desc;
+    for (const auto& e : Effects) {
+        desc.push_back(e.Desc + "(" + std::to_string(e.count) + ")");
+    }
+    return desc;
+}
+
 
 
 void Player::Levelup() {
@@ -813,6 +822,15 @@ float Enemy::getMissRate()const { return MissRate; }
 std::string Enemy::getSkillName() const { return Skillidx == -1 ? u8"攻擊" : Skills[Skillidx].Name; }
 std::string Enemy::getRace() const
 {return Race;}
+
+std::vector<std::string> Enemy::listEffectsDesc() const
+{
+    std::vector<std::string> desc;
+    for (const auto& e : Effects) {
+        desc.push_back(e.Desc + "(" + std::to_string(e.count) + ")");
+    }
+    return desc;
+}
 
 
 std::vector<Material> Enemy::getFallBackpack() const

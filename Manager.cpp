@@ -58,7 +58,7 @@ void showTreasureBoxSFML(const TreasureBox& box, sf::RenderWindow& window, sf::F
                 running = false;
         }
         window.clear(sf::Color(40, 30, 10));
-        sf::Text title("你打開了寶箱！", font, 28);
+        sf::Text title(sf::String::fromUtf8(u8"你打開了寶箱！", u8"你打開了寶箱！" + strlen(u8"你打開了寶箱！")), font, 28);
         title.setFillColor(sf::Color::Yellow);
         title.setPosition(60, 30);
         window.draw(title);
@@ -85,12 +85,12 @@ void showTreasureBoxSFML(const TreasureBox& box, sf::RenderWindow& window, sf::F
             window.draw(t);
         }
         if (box.ecMaterial.empty() && box.ecEquip.empty() && box.ecMiseryItem.empty()) {
-            sf::Text t("寶箱是空的...", font, 22);
+            sf::Text t(sf::String::fromUtf8(u8"寶箱是空的...", u8"寶箱是空的..." + strlen(u8"寶箱是空的...")), font, 22);
             t.setFillColor(sf::Color::Red);
             t.setPosition(60, y);
             window.draw(t);
         }
-        sf::Text ok("（點擊或按任意鍵繼續）", font, 18);
+        sf::Text ok(sf::String::fromUtf8(u8"（點擊或按任意鍵繼續）", u8"（點擊或按任意鍵繼續）" + strlen(u8"（點擊或按任意鍵繼續）")), font, 18);
         ok.setFillColor(sf::Color::White);
         ok.setPosition(60, y + 40);
         window.draw(ok);
