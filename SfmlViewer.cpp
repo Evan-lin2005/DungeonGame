@@ -618,38 +618,50 @@ void SFMLMANAGER::drawAll(sf::RenderWindow& window, const std::vector<std::vecto
     const std::vector<std::pair<int, int>>& merchants,
     const std::vector<std::pair<int, int>>& treasureBoxes,
     std::pair<int, int> stairsPos,
+    const std::set<std::pair<int,int>>& visible,
     int tileSize) {
     if (!loaded) return;
     int H = map.size(), W = map[0].size();
     for (int y = 0; y < H; ++y) {
         for (int x = 0; x < W; ++x) {
-            sf::Sprite* tile = nullptr;
-            if (map[y][x] == 0) tile = &wallSprite;
-            else if (map[y][x] == 1) tile = &groundSprite;
-            else if (map[y][x] == 2) tile = &stairSprite;
-            if (tile) {
-                tile->setPosition(x * tileSize, y * tileSize);
-                window.draw(*tile);
+            auto p = std::make_pair(x, y);
+            if (visible.count(p)) {
+                sf::Sprite* tile = nullptr;
+                if (map[y][x] == 0) tile = &wallSprite;
+                else if (map[y][x] == 1) tile = &groundSprite;
+                else if (map[y][x] == 2) tile = &stairSprite;
+                if (tile) {
+                    tile->setPosition(x * tileSize, y * tileSize);
+                    window.draw(*tile);
+                }
+            } else {
+                sf::RectangleShape fog(sf::Vector2f((float)tileSize, (float)tileSize));
+                fog.setFillColor(sf::Color(0,0,0));
+                fog.setPosition(x * tileSize, y * tileSize);
+                window.draw(fog);
             }
         }
     }
-    // �e�_�c
     for (auto& pos : treasureBoxes) {
-        treasureBoxSprite.setPosition(pos.first * tileSize, pos.second * tileSize);
-        window.draw(treasureBoxSprite);
+        if (visible.count(pos)) {
+            treasureBoxSprite.setPosition(pos.first * tileSize, pos.second * tileSize);
+            window.draw(treasureBoxSprite);
+        }
     }
-    // �e�ӤH
     for (auto& pos : merchants) {
-        merchantSprite.setPosition(pos.first * tileSize, pos.second * tileSize);
-        merchantSprite.setScale((float)tileSize / 16, (float)tileSize / 16);
-        window.draw(merchantSprite);
+        if (visible.count(pos)) {
+            merchantSprite.setPosition(pos.first * tileSize, pos.second * tileSize);
+            merchantSprite.setScale((float)tileSize / 16, (float)tileSize / 16);
+            window.draw(merchantSprite);
+        }
     }
     // 畫敵人
     if (g_mgr_ptr) {
         const auto& enemyObjs = g_mgr_ptr->getEnemies();
         for (size_t i = 0; i < enemies.size(); ++i) {
+            auto pos = enemies[i];
+            if (!visible.count(pos)) continue;
             if (i < enemyObjs.size()) {
-                auto pos = enemies[i];
                 std::string race = enemyObjs[i].enemy.getRace();
                 const sf::Texture* tex = getEnemyTexture(race);
                 if (!tex) tex = &enemyTexture;
@@ -658,13 +670,14 @@ void SFMLMANAGER::drawAll(sf::RenderWindow& window, const std::vector<std::vecto
                 sprite.setScale((float)tileSize / 24, (float)tileSize / 24);
                 window.draw(sprite);
             } else {
-                enemySprite.setPosition(enemies[i].first * tileSize, enemies[i].second * tileSize);
+                enemySprite.setPosition(pos.first * tileSize, pos.second * tileSize);
                 enemySprite.setScale((float)tileSize / 24, (float)tileSize / 24);
                 window.draw(enemySprite);
             }
         }
     } else {
         for (auto& pos : enemies) {
+            if (!visible.count(pos)) continue;
             enemySprite.setPosition(pos.first * tileSize, pos.second * tileSize);
             enemySprite.setScale((float)tileSize / 24, (float)tileSize / 24);
             window.draw(enemySprite);
