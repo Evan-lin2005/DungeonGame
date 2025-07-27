@@ -50,7 +50,9 @@ void Player::wearEquip(int idx) {
         Atk += it.affectAtk;
         Def += it.affectDef;
         MaxMp += it.affectMp;
+
         it.used = true;// 標記為已裝備
+
     }
 }
 

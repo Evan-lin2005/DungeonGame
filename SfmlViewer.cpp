@@ -642,6 +642,7 @@ void SFMLMANAGER::drawAll(sf::RenderWindow& window, const std::vector<std::vecto
             }
         }
     }
+
     // 樓梯
     if (visible.count(stairsPos)) {
         stairSprite.setPosition(stairsPos.first * tileSize, stairsPos.second * tileSize);
@@ -661,6 +662,13 @@ void SFMLMANAGER::drawAll(sf::RenderWindow& window, const std::vector<std::vecto
         }
     }
     // 畫敵人
+    for (auto& pos : enemies) {
+        if (!visible.count(pos)) continue;
+        enemySprite.setPosition(pos.first * tileSize, pos.second * tileSize);
+        enemySprite.setScale((float)tileSize / 24, (float)tileSize / 24);
+        window.draw(enemySprite);
+
+
     for (auto& pos : enemies) {
         if (!visible.count(pos)) continue;
         enemySprite.setPosition(pos.first * tileSize, pos.second * tileSize);
