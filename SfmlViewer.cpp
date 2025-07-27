@@ -656,32 +656,11 @@ void SFMLMANAGER::drawAll(sf::RenderWindow& window, const std::vector<std::vecto
         }
     }
     // 畫敵人
-    if (g_mgr_ptr) {
-        const auto& enemyObjs = g_mgr_ptr->getEnemies();
-        for (size_t i = 0; i < enemies.size(); ++i) {
-            auto pos = enemies[i];
-            if (!visible.count(pos)) continue;
-            if (i < enemyObjs.size()) {
-                std::string race = enemyObjs[i].enemy.getRace();
-                const sf::Texture* tex = getEnemyTexture(race);
-                if (!tex) tex = &enemyTexture;
-                sf::Sprite sprite(*tex, sf::IntRect(0, 0, 24, 24));
-                sprite.setPosition(pos.first * tileSize, pos.second * tileSize);
-                sprite.setScale((float)tileSize / 24, (float)tileSize / 24);
-                window.draw(sprite);
-            } else {
-                enemySprite.setPosition(pos.first * tileSize, pos.second * tileSize);
-                enemySprite.setScale((float)tileSize / 24, (float)tileSize / 24);
-                window.draw(enemySprite);
-            }
-        }
-    } else {
-        for (auto& pos : enemies) {
-            if (!visible.count(pos)) continue;
-            enemySprite.setPosition(pos.first * tileSize, pos.second * tileSize);
-            enemySprite.setScale((float)tileSize / 24, (float)tileSize / 24);
-            window.draw(enemySprite);
-        }
+    for (auto& pos : enemies) {
+        if (!visible.count(pos)) continue;
+        enemySprite.setPosition(pos.first * tileSize, pos.second * tileSize);
+        enemySprite.setScale((float)tileSize / 24, (float)tileSize / 24);
+        window.draw(enemySprite);
     }
     //e
     playerSprite.setPosition(playerPos.first * tileSize, playerPos.second * tileSize);

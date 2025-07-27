@@ -339,7 +339,9 @@ void DungeonGame::runSFML() {
                 mapInt[y][x] = (int)(*mapData)[y][x];
         // 整理物件座標
         std::vector<std::pair<int, int>> enemies, merchants, treasureBoxes;
-        for (const auto& e : mgr.getEnemies()) enemies.push_back(e.pos);
+        for (const auto& e : mgr.getEnemies())
+            if (!e.enemy.Died())
+                enemies.push_back(e.pos);
         for (const auto& m : mgr.getMerchants()) merchants.push_back(m.pos);
         for (const auto& t : mgr.getTreasureBoxes()) treasureBoxes.push_back(t.pos);
         auto playerPos = mgr.getPlayerPos();
