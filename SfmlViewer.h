@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 using namespace sf;
 #include "Battle.h"
+#include <set>
 
 // SFML 圖像化戰鬥介面
 struct SfmlBattleUI : public BattleUI {
@@ -42,6 +43,7 @@ public:
         const std::vector<std::pair<int, int>>& merchants,
         const std::vector<std::pair<int, int>>& treasureBoxes,
         std::pair<int, int> stairsPos,
+        const std::set<std::pair<int,int>>& visible,
         int tileSize = 24);
     // 取得敵人圖檔快取指標
     const sf::Texture* getEnemyTexture(const std::string& race) const {
