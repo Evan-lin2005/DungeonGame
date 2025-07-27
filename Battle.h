@@ -119,7 +119,12 @@ struct ConsoleBattleUI : public BattleUI {
         clearScreen();
         std::cout << info << std::endl;
         std::cout << "玩家: " << a.getname() << " HP=" << a.gethp() << "/" << a.getMaxHp() << " MP=" << a.getmp() << "/" << a.getMaxMp() << std::endl;
-        std::cout << "敵人: " << b.getname() << " HP=" << b.gethp()<< " MP=" << b.getmp() << std::endl;
+        std::cout << "敵人: " << b.getname() << " HP=" << b.gethp() << " MP=" << b.getmp() << std::endl;
+        std::cout << "玩家效果: ";
+        for (const auto& d : a.listEffectsDesc()) std::cout << d << ' ';
+        std::cout << "\n敵人效果: ";
+        for (const auto& d : b.listEffectsDesc()) std::cout << d << ' ';
+        std::cout << std::endl;
     }
     int getPlayerAction(const Player& a, const Enemy& b) override {
         return choose();
