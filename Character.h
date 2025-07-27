@@ -57,7 +57,9 @@ public:
     void earnmoney(int type, int amount);
 	void earnmoney(const Money& amount);
     void spendmoney(Money &amount);
-	bool HaveEnoughMoney(const Money &m) const;
+    bool HaveEnoughMoney(const Money &m) const;
+    // 將100銅自動兌換為1銀，100銀兌換為1金
+    void normalizeMoney();
     void getMaterial(const Material& item);
 	void throwMaterial(const Material& item);
 	bool HaveEnoughMaterial(const std::vector<Material>& item) const;

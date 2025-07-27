@@ -2,6 +2,7 @@
 #include "DungeonGame.h"
 #include "SfmlViewer.h"
 #include <SFML/Graphics.hpp>
+#include "Character.h"
 
 Manager* g_mgr_ptr = nullptr;
 sf::RenderWindow* g_sfmlWindow = nullptr;
@@ -136,6 +137,8 @@ void DungeonGame::runSFML() {
         }
         if (triggerSkill) {
             // 圖像化換技能介面
+            int scrollOffset = 0;
+            const int maxShow = 10;
             while (window.isOpen()) {
                 window.clear(sf::Color(30,30,30));
                 sf::Text title(sf::String::fromUtf8(u8"技能列表 (ESC 離開)", u8"技能列表 (ESC 離開)" + strlen(u8"技能列表 (ESC 離開)")), font, 22);
@@ -147,7 +150,7 @@ void DungeonGame::runSFML() {
                 int y = 60;
                 int hover = -1;
                 sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                for (size_t i = 0; i < skills.size(); ++i) {
+                for (size_t i = scrollOffset; i < skills.size() && i < scrollOffset + maxShow; ++i) {
                     std::string skillStr = std::to_string(i) + ". " + skills[i].first + " - " + skills[i].second;
                     for (auto& bs : battleSkills) {
                         if (bs.first == skills[i].first) skillStr = u8"★ " + skillStr;
@@ -169,6 +172,14 @@ void DungeonGame::runSFML() {
                 while (window.pollEvent(e2)) {
                     if (e2.type == sf::Event::Closed) { window.close(); leave = true; }
                     if (e2.type == sf::Event::KeyPressed && e2.key.code == sf::Keyboard::Escape) leave = true;
+                    if (e2.type == sf::Event::KeyPressed) {
+                        if (e2.key.code == sf::Keyboard::Down && scrollOffset + maxShow < (int)skills.size()) scrollOffset++;
+                        if (e2.key.code == sf::Keyboard::Up && scrollOffset > 0) scrollOffset--;
+                    }
+                    if (e2.type == sf::Event::MouseWheelScrolled) {
+                        if (e2.mouseWheelScroll.delta < 0 && scrollOffset + maxShow < (int)skills.size()) scrollOffset++;
+                        if (e2.mouseWheelScroll.delta > 0 && scrollOffset > 0) scrollOffset--;
+                    }
                     if (e2.type == sf::Event::MouseButtonPressed && e2.mouseButton.button == sf::Mouse::Left && hover >= 0) {
                         // 檢查是否已在戰鬥技能欄
                         bool alreadyInBattle = false;
@@ -187,7 +198,7 @@ void DungeonGame::runSFML() {
                             sf::Text msgT(sf::String::fromUtf8(msg.begin(), msg.end()), font, 24); msgT.setFillColor(sf::Color::White); msgT.setPosition(100, 200); window.draw(msgT);
                             window.display();
                             sf::sleep(sf::seconds(1));
-                        } else if (battleSkills.size() < 4) {
+                        } else if (battleSkills.size() < MaxBattleSkill) {
                             // 直接加入
                             bool ok = mgr.getPlayer().setbattleskill(hover);
                             window.clear(sf::Color(30,30,30));

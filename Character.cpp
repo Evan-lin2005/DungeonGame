@@ -387,21 +387,24 @@ void Player::earnmoney(int type, int amount)
     }
     else if (type == 2) { // 銅幣
         money.Cooper += amount;
-	}
+    }
+    normalizeMoney();
 }
 
 void Player::earnmoney(const Money& amount)
 {
     money.Gold += amount.Gold;
     money.Sliver += amount.Sliver;
-	money.Cooper += amount.Cooper;
+    money.Cooper += amount.Cooper;
+    normalizeMoney();
 }
 
 void Player::spendmoney(Money& amount)
 {
-	money.Gold -= amount.Gold;
-	money.Sliver -= amount.Sliver;
-	money.Cooper -= amount.Cooper;
+        money.Gold -= amount.Gold;
+        money.Sliver -= amount.Sliver;
+        money.Cooper -= amount.Cooper;
+        normalizeMoney();
 }
 
 bool Player::HaveEnoughMoney(const Money &m) const
@@ -411,6 +414,18 @@ bool Player::HaveEnoughMoney(const Money &m) const
         return true;
     }
     return false;
+}
+
+void Player::normalizeMoney()
+{
+    if (money.Cooper >= 100) {
+        money.Sliver += money.Cooper / 100;
+        money.Cooper %= 100;
+    }
+    if (money.Sliver >= 100) {
+        money.Gold += money.Sliver / 100;
+        money.Sliver %= 100;
+    }
 }
 
 bool Player::goToNextLevel() const
