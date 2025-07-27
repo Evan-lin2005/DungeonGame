@@ -475,6 +475,8 @@ void Manager::printMap() const {
 Player& Manager::getPlayer() { return player; }
 const Player& Manager::getPlayer() const { return player; }
 
+const std::set<std::pair<int,int>>& Manager::getVisible() const { return allsearchPos; }
+
 void Manager::Shouldadjust()
 {
     addjust= true;

@@ -2,7 +2,7 @@
 #include "Addition.h"
 #include "Item.h"
 
-constexpr int MaxBattleSkill = 4;
+constexpr int MaxBattleSkill = 6;
 constexpr int ExpPerLevel = 100;
 
 

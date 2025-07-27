@@ -106,6 +106,7 @@ void DungeonGame::runSFML() {
     auto& mgr = mgr_;
     SFMLMANAGER sfmlMgr;
     sfmlMgr.loadTextures();
+    g_mgr_ptr = &mgr;
     const auto* mapData = &mgr.getMapGenerator().getMap();
     int H = mapData->size(), W = (*mapData)[0].size();
     sf::RenderWindow window(sf::VideoMode(W * tileSize, H * tileSize),"DungeonGame(SFML)");
@@ -344,7 +345,7 @@ void DungeonGame::runSFML() {
         auto playerPos = mgr.getPlayerPos();
         auto stairsPos = mgr.getMapGenerator().getStairs();
         window.clear();
-        sfmlMgr.drawAll(window, mapInt, playerPos, enemies, merchants, treasureBoxes, stairsPos, tileSize);
+        sfmlMgr.drawAll(window, mapInt, playerPos, enemies, merchants, treasureBoxes, stairsPos, mgr.getVisible(), tileSize);
         window.display();
         // 新增：遊戲結束判斷
         if (mgr.isGameOver()) {
