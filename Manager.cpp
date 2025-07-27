@@ -353,12 +353,13 @@ void Manager::operateEquip()
                 continue;
             }
             int newItemIndex = stoi(newItemName);
-            if(oldItemIndex == newItemIndex || newItemIndex < 0 || newItemIndex >= player.getEquipSize()) {
+            if (newItemIndex < 0 || newItemIndex >= player.getEquipSize() || oldItemIndex == newItemIndex) {
                 std::cout << " L Ī    ~ s   A Э  s  J C" << std::endl;
                 continue;
-			}
+                        }
+            if (newItemIndex > oldItemIndex) newItemIndex--;
             player.throwEquip(oldItemIndex);
-			player.wearEquip(newItemIndex);
+                        player.wearEquip(newItemIndex);
         }
         else if (choice == "3") {
             return;
