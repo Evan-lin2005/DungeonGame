@@ -2,6 +2,7 @@
 #include "DungeonGame.h"
 #include "SfmlViewer.h"
 #include <SFML/Graphics.hpp>
+#include "Character.h"
 
 Manager* g_mgr_ptr = nullptr;
 sf::RenderWindow* g_sfmlWindow = nullptr;
@@ -104,8 +105,8 @@ void DungeonGame::run() {
 void DungeonGame::runSFML() {
     const int tileSize = 24;
     auto& mgr = mgr_;
-    SFMLMANAGER sfmlMgr;
     sfmlMgr.loadTextures();
+    g_mgr_ptr = &mgr;
     const auto* mapData = &mgr.getMapGenerator().getMap();
     int H = mapData->size(), W = (*mapData)[0].size();
     sf::RenderWindow window(sf::VideoMode(W * tileSize, H * tileSize),"DungeonGame(SFML)");
@@ -135,6 +136,8 @@ void DungeonGame::runSFML() {
         }
         if (triggerSkill) {
             // 圖像化換技能介面
+            int scrollOffset = 0;
+            const int maxShow = 10;
             while (window.isOpen()) {
                 window.clear(sf::Color(30,30,30));
                 sf::Text title(sf::String::fromUtf8(u8"技能列表 (ESC 離開)", u8"技能列表 (ESC 離開)" + strlen(u8"技能列表 (ESC 離開)")), font, 22);
@@ -146,7 +149,7 @@ void DungeonGame::runSFML() {
                 int y = 60;
                 int hover = -1;
                 sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                for (size_t i = 0; i < skills.size(); ++i) {
+                for (size_t i = scrollOffset; i < skills.size() && i < scrollOffset + maxShow; ++i) {
                     std::string skillStr = std::to_string(i) + ". " + skills[i].first + " - " + skills[i].second;
                     for (auto& bs : battleSkills) {
                         if (bs.first == skills[i].first) skillStr = u8"★ " + skillStr;
@@ -168,6 +171,14 @@ void DungeonGame::runSFML() {
                 while (window.pollEvent(e2)) {
                     if (e2.type == sf::Event::Closed) { window.close(); leave = true; }
                     if (e2.type == sf::Event::KeyPressed && e2.key.code == sf::Keyboard::Escape) leave = true;
+                    if (e2.type == sf::Event::KeyPressed) {
+                        if (e2.key.code == sf::Keyboard::Down && scrollOffset + maxShow < (int)skills.size()) scrollOffset++;
+                        if (e2.key.code == sf::Keyboard::Up && scrollOffset > 0) scrollOffset--;
+                    }
+                    if (e2.type == sf::Event::MouseWheelScrolled) {
+                        if (e2.mouseWheelScroll.delta < 0 && scrollOffset + maxShow < (int)skills.size()) scrollOffset++;
+                        if (e2.mouseWheelScroll.delta > 0 && scrollOffset > 0) scrollOffset--;
+                    }
                     if (e2.type == sf::Event::MouseButtonPressed && e2.mouseButton.button == sf::Mouse::Left && hover >= 0) {
                         // 檢查是否已在戰鬥技能欄
                         bool alreadyInBattle = false;
@@ -186,7 +197,7 @@ void DungeonGame::runSFML() {
                             sf::Text msgT(sf::String::fromUtf8(msg.begin(), msg.end()), font, 24); msgT.setFillColor(sf::Color::White); msgT.setPosition(100, 200); window.draw(msgT);
                             window.display();
                             sf::sleep(sf::seconds(1));
-                        } else if (battleSkills.size() < 4) {
+                        } else if (battleSkills.size() < MaxBattleSkill) {
                             // 直接加入
                             bool ok = mgr.getPlayer().setbattleskill(hover);
                             window.clear(sf::Color(30,30,30));
@@ -338,13 +349,15 @@ void DungeonGame::runSFML() {
                 mapInt[y][x] = (int)(*mapData)[y][x];
         // 整理物件座標
         std::vector<std::pair<int, int>> enemies, merchants, treasureBoxes;
-        for (const auto& e : mgr.getEnemies()) enemies.push_back(e.pos);
+        for (const auto& e : mgr.getEnemies())
+            if (!e.enemy.Died())
+                enemies.push_back(e.pos);
         for (const auto& m : mgr.getMerchants()) merchants.push_back(m.pos);
         for (const auto& t : mgr.getTreasureBoxes()) treasureBoxes.push_back(t.pos);
         auto playerPos = mgr.getPlayerPos();
         auto stairsPos = mgr.getMapGenerator().getStairs();
         window.clear();
-        sfmlMgr.drawAll(window, mapInt, playerPos, enemies, merchants, treasureBoxes, stairsPos, tileSize);
+        sfmlMgr.drawAll(window, mapInt, playerPos, enemies, merchants, treasureBoxes, stairsPos, mgr.getVisible(), tileSize);
         window.display();
         // 新增：遊戲結束判斷
         if (mgr.isGameOver()) {
