@@ -102,6 +102,7 @@ public:
     bool goToNextLevel()const;
 
     float getMissRate()const;
+    std::vector<std::string> listEffectsDesc() const;
     // 新增：取得裝備列表（只讀）
     const std::vector<Equip>& getEquips() const;
 private:
@@ -150,7 +151,8 @@ public:
 	float getMissRate() const;
 	std::string getRace() const;
     std::string getSkillName() const;
-	std::vector<Material> getFallBackpack() const;
+    std::vector<Material> getFallBackpack() const;
+    std::vector<std::string> listEffectsDesc() const;
     void upgrageByFloor(int floor);
     void CritizeByPlayerLv(int lv);
 private:

@@ -119,6 +119,20 @@ void SfmlBattleUI::showState(const Player& a, const Enemy& b, const std::string&
     eMp.setFillColor(sf::Color(80,80,255));
     eMp.setPosition(320, 155);
     g_battleWindow->draw(eMp);
+    int py = 240;
+    for (const auto& d : a.listEffectsDesc()) {
+        sf::Text t(sf::String::fromUtf8(d.begin(), d.end()), g_battleFont, 14);
+        t.setPosition(60, py);
+        g_battleWindow->draw(t);
+        py += 20;
+    }
+    int ey = 240;
+    for (const auto& d : b.listEffectsDesc()) {
+        sf::Text t(sf::String::fromUtf8(d.begin(), d.end()), g_battleFont, 14);
+        t.setPosition(300, ey);
+        g_battleWindow->draw(t);
+        ey += 20;
+    }
     // 操作提示
     sf::Text op1(sf::String::fromUtf8(u8"1.攻擊  2.技能  3.道具", u8"1.攻擊  2.技能  3.道具" + strlen(u8"1.攻擊  2.技能  3.道具")), g_battleFont, 18);
     op1.setPosition(120, 320);
@@ -481,8 +495,8 @@ bool Battle(Player& a, Enemy& b, BattleUI* ui) {
                 a.BeEffect(*playerRes.effect);
                 info += " " + a.getname() + " 獲得" + playerRes.effect->Desc + "!";
             } else if (playerRes.target == Target::ENEMY) {
-                if (rand() % 100 >= int(b.getMissRate() * 100)) {
-                    b.BeEffect(*playerRes.effect);
+                if (rand() % 100 >= int(b.getMissRate())) {
+       b.BeEffect(*playerRes.effect);
                     info += " " + b.getname() + " 受到" + playerRes.effect->Desc + "!";
                 } else {
                     info += " 敵人閃避了效果";
@@ -490,7 +504,8 @@ bool Battle(Player& a, Enemy& b, BattleUI* ui) {
             }
         }
         if (playerRes.immediateDamage > 0) {
-            if (rand() % 100 >= int(b.getMissRate() * 100)) {
+            if (rand() % 100 >= int(b.getMissRate())) {
+
                 int dmg = b.BeAttacked(playerRes.immediateDamage);
                 if (auto sfmlui = dynamic_cast<SfmlBattleUI*>(ui)) {
                     sfmlui->floatingNumbers.push_back({dmg, sf::Vector2f(340, 120), sf::Color::Red, 2.0f});
@@ -518,7 +533,7 @@ bool Battle(Player& a, Enemy& b, BattleUI* ui) {
                 b.BeEffect(*enemyRes.effect);
                 info = b.getname() + " 獲得" + enemyRes.effect->Desc + "!";
             } else if (enemyRes.target == Target::ENEMY) {
-                if (rand() % 100 >= int(a.getMissRate() * 100)) {
+                if (rand() % 100 >= int(a.getMissRate())) {
                     a.BeEffect(*enemyRes.effect);
                     info = a.getname() + " 受到" + enemyRes.effect->Desc + "!";
                 } else {
@@ -527,7 +542,7 @@ bool Battle(Player& a, Enemy& b, BattleUI* ui) {
             }
         }
         if (enemyRes.immediateDamage > 0) {
-            if (rand() % 100 >= int(a.getMissRate() * 100)) {
+            if (rand() % 100 >= int(a.getMissRate())) {
                 int dmg = a.Beattacked(enemyRes.immediateDamage);
                 if (auto sfmlui = dynamic_cast<SfmlBattleUI*>(ui)) {
                     sfmlui->floatingNumbers.push_back({dmg, sf::Vector2f(100, 120), sf::Color::Yellow, 2.0f});
