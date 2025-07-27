@@ -199,26 +199,27 @@ void Manager::spawnMerchants(int count, const std::string& merchantDataPath) {
 }
 
 void Manager::battleIfNeeded() {
-    for (auto& e : enemies) {
-        if (!e.enemy.Died() && e.pos == playerPos) {
+    for (auto it = enemies.begin(); it != enemies.end(); ++it) {
+        if (!it->enemy.Died() && it->pos == playerPos) {
             if (addjust)
             {
-                e.enemy.CritizeByPlayerLv(player.getlv());
+                it->enemy.CritizeByPlayerLv(player.getlv());
             }
             bool win;
             if (g_useSFMLBattle) {
                 extern sf::RenderWindow* g_sfmlWindow;
-                win = BattleSFML(*g_sfmlWindow, player, e.enemy);
+                win = BattleSFML(*g_sfmlWindow, player, it->enemy);
             } else {
-                win = Battle(player, e.enemy);
+                win = Battle(player, it->enemy);
             }
             if (win) {
-                EnemyInMap::allPos.erase(e.pos);
-                player.earnedexp(e.enemy.Giveexp());
-                auto items = e.enemy.getFallBackpack();
-                for(auto & item : items) {
+                EnemyInMap::allPos.erase(it->pos);
+                player.earnedexp(it->enemy.Giveexp());
+                auto items = it->enemy.getFallBackpack();
+                for (auto& item : items) {
                     player.getMaterial(item);
                 }
+                enemies.erase(it);
             }
             else {
                 gameOver = true;
